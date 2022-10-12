@@ -43,11 +43,12 @@ class FoodapiChannel extends ApplicationChannel {
 
   @override
   Future prepare() async {
+    options?.address = "0.0.0.0";
     logger.onRecord.listen(
         (rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
     final persistence = PostgreSQLPersistentStore(
-        "postgres", "password", "127.0.0.1", 5432, "food");
+        "postgres", "password", "postgres", 5432, "food");
     context = ManagedContext(dataModel, persistence);
   }
 
@@ -64,6 +65,7 @@ class FoodapiChannel extends ApplicationChannel {
     router.route("/freezer[/:id]").link(() => FreezerController(context));
     router.route("/favorite[/:id]").link(() => FavoriteController(context));
     router.route("/user").link(() => UserController(context));
+    router.route("/user/:id").link(() => UserInfoController(context));
 
     return router;
   }

@@ -5,6 +5,20 @@ import 'package:uuid/uuid.dart';
 
 import '../model/user.dart';
 
+class UserInfoController extends ResourceController {
+  ManagedContext context;
+
+  UserInfoController(this.context);
+
+  @Operation.get("id")
+  Future<Response> getUser(@Bind.path("id") String id) async {
+    final query = Query<User>(context)
+      ..where((x) => x.id).equalTo(int.tryParse(id));
+    final data = await query.fetchOne();
+    return Response.ok(data);
+  }
+}
+
 class UserController extends ResourceController {
   ManagedContext context;
 
@@ -39,7 +53,7 @@ class UserController extends ResourceController {
     if (registered != null) {
       return Response.conflict(body: {"error": "login is already registered"});
     }
-    final newUser = await Query<User>(context)
+    final newUser = Query<User>(context)
       ..values.login = user.login
       ..values.password = user.password;
     await newUser.insert();
@@ -57,7 +71,7 @@ class UserController extends ResourceController {
     await query.updateOne();
 
     if (registered == null) {
-      return Response.forbidden(body: {'status':'credentials are invalid'});
+      return Response.forbidden(body: {'status': 'credentials are invalid'});
     } else {
       return Response.ok({'token': token});
     }
