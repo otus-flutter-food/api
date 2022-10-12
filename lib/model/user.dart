@@ -18,6 +18,9 @@ class _User {
   @Column()
   String? token;
 
+  @Column()
+  String? avatar;
+
   ManagedSet<Freezer>? userFreezer;
 
   ManagedSet<Favorite>? favoriteRecipes;
