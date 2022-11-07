@@ -9,4 +9,3 @@ class MeasureUnitController extends ManagedObjectController<MeasureUnit> {
 class IngredientController extends ManagedObjectController<Ingredient> {
   IngredientController(ManagedContext context) : super(context);
 }
-

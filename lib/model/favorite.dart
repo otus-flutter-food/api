@@ -1,4 +1,3 @@
-
 import '../foodapi.dart';
 import 'recipe.dart';
 import 'user.dart';
@@ -15,4 +14,3 @@ class _Favorite {
   @Relate(#favoriteRecipes)
   User? user;
 }
-

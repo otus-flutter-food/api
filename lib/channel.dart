@@ -1,6 +1,9 @@
 import 'package:conduit_common/conduit_common.dart';
 import 'package:foodapi/controllers/freezer.dart';
-import 'package:foodapi/controllers/user.dart';
+import 'package:foodapi/controllers/token_controller.dart';
+import 'package:foodapi/controllers/user_controller.dart';
+import 'package:foodapi/controllers/auth_controller.dart';
+// import 'package:foodapi/controllers/user.dart';
 import 'package:foodapi/foodapi.dart';
 import 'package:conduit_open_api/v3.dart';
 
@@ -48,24 +51,27 @@ class FoodapiChannel extends ApplicationChannel {
         (rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
     final persistence = PostgreSQLPersistentStore(
-        "postgres", "password", "postgres", 5432, "food");
+        "admin", "root", "127.0.0.1", 5432, "postgres");
     context = ManagedContext(dataModel, persistence);
   }
 
   @override
   Controller get entryPoint {
-    final router = Router();
-
-    router.route("/recipe[/:id]").link(() => RecipeController(context));
-    router.route("/comment[/:id]").link(() => CommentController(context));
-    router.route("/ingredient[/:id]").link(() => IngredientController(context));
-    router
-        .route("/measure_unit[/:id]")
-        .link(() => MeasureUnitController(context));
-    router.route("/freezer[/:id]").link(() => FreezerController(context));
-    router.route("/favorite[/:id]").link(() => FavoriteController(context));
-    router.route("/user").link(() => UserController(context));
-    router.route("/user/:id").link(() => UserInfoController(context));
+    final router = Router()
+      ..route("token/[:refresh]").link(
+        () => AppAuthController(context),
+      )
+      ..route("user")
+          .link(() => TokenController())!
+          .link(() => UserController(context))
+      ..route("/recipe[/:id]").link(() => RecipeController(context))
+      ..route("/comment[/:id]").link(() => CommentController(context))
+      ..route("/ingredient[/:id]").link(() => IngredientController(context))
+      ..route("/measure_unit[/:id]").link(() => MeasureUnitController(context))
+      ..route("/freezer[/:id]").link(() => FreezerController(context))
+      ..route("/favorite[/:id]").link(() => FavoriteController(context));
+    //router.route("/user").link(() => UserController(context));
+    //router.route("/user/:id").link(() => UserInfoController(context));
 
     return router;
   }

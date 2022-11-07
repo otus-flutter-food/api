@@ -1,4 +1,5 @@
 import 'package:conduit/conduit.dart';
+import 'package:foodapi/model/comment.dart';
 
 import 'favorite.dart';
 import 'ingredient.dart';
@@ -13,7 +14,7 @@ class _Recipe {
   String? name;
 
   @Column()
-  int? duration;      //in seconds
+  int? duration; //in seconds
 
   @Column()
   String? photo;
@@ -23,6 +24,8 @@ class _Recipe {
   ManagedSet<RecipeStepLink>? recipeStepLinks;
 
   ManagedSet<Favorite>? favoriteRecipes;
+
+  ManagedSet<Comment>? comments;
 }
 
 class RecipeStep extends ManagedObject<_RecipeStep> implements _RecipeStep {}
@@ -35,13 +38,13 @@ class _RecipeStep {
   String? name;
 
   @Column()
-  int? duration;    //in seconds
+  int? duration; //in seconds
 
   ManagedSet<RecipeStepLink>? recipeStepLinks;
 }
 
-
-class RecipeStepLink extends ManagedObject<_RecipeStepLink> implements _RecipeStepLink {}
+class RecipeStepLink extends ManagedObject<_RecipeStepLink>
+    implements _RecipeStepLink {}
 
 class _RecipeStepLink {
   @primaryKey
