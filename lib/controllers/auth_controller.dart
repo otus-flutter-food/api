@@ -106,8 +106,8 @@ class AppAuthController extends ResourceController {
 
   Map<String, dynamic> _getTokens(int id) {
     final key = AppEnv.secretKey;
-    final accessClaimSet =
-        JwtClaim(maxAge: Duration(hours: 1), otherClaims: {"id": id});
+    final accessClaimSet = JwtClaim(
+        maxAge: Duration(minutes: AppEnv.time), otherClaims: {"id": id});
     final refreshClaimSet = JwtClaim(otherClaims: {"id": id});
     final tokens = <String, dynamic>{};
     tokens["access"] = issueJwtHS256(accessClaimSet, key);

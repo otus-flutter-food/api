@@ -16,4 +16,6 @@ abstract class AppEnv {
   static final String dbPort = Platform.environment["DB_PORT"] ?? "6101";
   static final String dbDatabaseName =
       Platform.environment["DB_NAME"] ?? "postgres";
+  static final int time =
+      int.tryParse(Platform.environment["TIME"] ?? "1") ?? 10;
 }

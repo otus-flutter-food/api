@@ -27,4 +27,7 @@ class AppResponse extends Response {
   AppResponse.badRequest({String? message})
       : super.badRequest(
             body: ResponseModel(message: message ?? "Ошибка запроса"));
+
+  AppResponse.unauthorized(dynamic error, {String? message})
+      : super.unauthorized(body: _getResponseModel(error, message));
 }
