@@ -9,14 +9,26 @@ class _User {
   @primaryKey
   int? id;
 
-  @Column()
-  String? login;
+  @Column(unique: true, indexed: true)
+  String? username;
 
-  @Column()
+  @Serialize(input: true, output: false)
   String? password;
 
-  @Column()
-  String? token;
+  @Column(unique: true, indexed: true)
+  String? email;
+
+  @Column(nullable: true)
+  String? accessToken;
+
+  @Column(nullable: true)
+  String? refreshToken;
+
+  @Column(omitByDefault: true)
+  String? salt;
+
+  @Column(omitByDefault: true)
+  String? hashPassword;
 
   @Column()
   String? avatar;
