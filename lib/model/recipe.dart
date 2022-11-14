@@ -23,6 +23,8 @@ class _Recipe {
   ManagedSet<RecipeStepLink>? recipeStepLinks;
 
   ManagedSet<Favorite>? favoriteRecipes;
+  
+  ManagedSet<Comment>? comments;
 }
 
 class RecipeStep extends ManagedObject<_RecipeStep> implements _RecipeStep {}
