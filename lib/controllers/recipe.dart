@@ -6,7 +6,7 @@ class RecipeController extends ManagedObjectController<Recipe> {
   RecipeController(ManagedContext context) : super(context);
 }
 
-clas RecipeStepController extends ManagedObjectController<RecipeStep> {
+class RecipeStepController extends ManagedObjectController<RecipeStep> {
   RecipeControllerStep(ManagedContext context) : super(context);
 }
 
