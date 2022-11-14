@@ -18,4 +18,7 @@ class _Comment {
 
   @Column()
   DateTime? datetime;
+  
+  @Relate(#comments)
+  Recipe recipe;
 }
