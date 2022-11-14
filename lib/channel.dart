@@ -57,6 +57,7 @@ class FoodapiChannel extends ApplicationChannel {
     final router = Router();
 
     router.route("/recipe[/:id]").link(() => RecipeController(context));
+    router.route("/recipe_step[/:id]").link(() => RecipeStepController(context));
     router.route("/comment[/:id]").link(() => CommentController(context));
     router.route("/ingredient[/:id]").link(() => IngredientController(context));
     router
