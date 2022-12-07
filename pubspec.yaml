@@ -7,7 +7,7 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
-  conduit: 3.2.9
+  conduit: ^3.2.10
   jaguar_jwt: 3.0.0
   # uuid:
 

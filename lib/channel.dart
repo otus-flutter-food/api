@@ -46,9 +46,14 @@ class FoodapiChannel extends ApplicationChannel {
 
   @override
   Future prepare() async {
+    CORSPolicy.defaultPolicy.allowedOrigins = [
+      "172.20.20.4:8888", "0.0.0.0"
+      // "https://dart.nvavia.ru",
+      // "localhost:8888",
+    ];
     options?.address = "0.0.0.0";
-    logger.onRecord.listen(
-        (rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
+    logger.onRecord.listen((rec) => print(
+        "Rec: ${rec.toString()} ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
     final persistence = PostgreSQLPersistentStore(
         "admin", "root", "127.0.0.1", 5432, "postgres");
@@ -61,7 +66,7 @@ class FoodapiChannel extends ApplicationChannel {
       ..route("token/[:refresh]").link(
         () => AppAuthController(context),
       )
-      ..route("user")
+      ..route("/user")
           .link(() => TokenController())!
           .link(() => UserController(context))
       ..route("/recipe[/:id]").link(() => RecipeController(context))

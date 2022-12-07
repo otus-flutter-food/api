@@ -6,6 +6,11 @@ import '../model/recipe.dart';
 // }
 class RecipeController extends ResourceController {
   RecipeController(this.context);
+  // {
+  //   policy!.allowedOrigins.add("https://dart.nvavia.ru/recipe");
+  //   policy!.allowedOrigins.add("localhost:8888/recipe");
+  //   policy!.allowedMethods.add("GET");
+  // }
 
   final ManagedContext context;
 
@@ -25,8 +30,12 @@ class RecipeController extends ResourceController {
     // ..join(set: (f) => f.favoriteRecipes) //.join(object: (f) => f.recipe)
     // ..join(set: (c) => c.comments); //.join(object: (c) => c.recipe);
     final recipe = await query.fetch();
-
-    return Response.ok(recipe);
+    Response response = Response.ok(recipe);
+    final aloowCORS = <String, dynamic>{"Access-Control-Allow-Origin": "*"};
+    response.headers.addEntries(aloowCORS.entries);
+    // response.addheaders.;
+    CORSPolicy.defaultPolicy.allowedOrigins.add("localhost:8888/recipe");
+    return response;
   }
 
   @Operation.get('id')

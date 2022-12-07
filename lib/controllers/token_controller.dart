@@ -11,7 +11,7 @@ class TokenController extends Controller {
   FutureOr<RequestOrResponse?> handle(Request request) {
     try {
       final header = request.raw.headers.value(HttpHeaders.authorizationHeader);
-      final token = AuthorizationBearerParser().parse(header);
+      final token = const AuthorizationBearerParser().parse(header);
       final jwtClaim = verifyJwtHS256Signature(token ?? "", AppEnv.secretKey);
       jwtClaim.validate();
       return request;
