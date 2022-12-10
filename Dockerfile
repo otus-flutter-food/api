@@ -1,4 +1,4 @@
-FROM dart:2.15
+FROM dart:2.18
 
 ADD . /opt/
 
@@ -9,3 +9,4 @@ RUN dart pub get
 RUN chmod +x *.sh
 
 CMD dart bin/main.dart
+

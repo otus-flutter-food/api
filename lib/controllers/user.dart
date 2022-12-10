@@ -1,14 +1,14 @@
 import 'package:conduit/conduit.dart';
-import 'package:conduit_open_api/v3.dart';
 import 'package:conduit_common/conduit_common.dart';
+import 'package:conduit_open_api/v3.dart';
 import 'package:uuid/uuid.dart';
 
 import '../model/user.dart';
 
 class UserInfoController extends ResourceController {
-  ManagedContext context;
 
   UserInfoController(this.context);
+  ManagedContext context;
 
   @Operation.get("id")
   Future<Response> getUser(@Bind.path("id") String id) async {
@@ -20,9 +20,9 @@ class UserInfoController extends ResourceController {
 }
 
 class UserController extends ResourceController {
-  ManagedContext context;
 
   UserController(this.context);
+  ManagedContext context;
 
   @override
   Map<String, APIResponse> documentOperationResponses(

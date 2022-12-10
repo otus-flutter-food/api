@@ -1,4 +1,5 @@
 import '../foodapi.dart';
+import 'recipe.dart';
 import 'user.dart';
 
 class Comment extends ManagedObject<_Comment> implements _Comment {}
@@ -10,6 +11,9 @@ class _Comment {
   @Relate(#comments)
   User? user;
 
+  @Relate(#comments)
+  Recipe? recipe;
+
   @Column()
   String? text;
 
@@ -18,7 +22,4 @@ class _Comment {
 
   @Column()
   DateTime? datetime;
-  
-  @Relate(#comments)
-  Recipe recipe;
 }

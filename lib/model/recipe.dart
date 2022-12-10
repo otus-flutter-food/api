@@ -1,5 +1,6 @@
 import 'package:conduit/conduit.dart';
 
+import 'comment.dart';
 import 'favorite.dart';
 import 'ingredient.dart';
 
