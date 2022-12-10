@@ -15,10 +15,10 @@ class _User {
   @Column()
   String? password;
 
-  @Column()
+  @Column(nullable: true)
   String? token;
 
-  @Column()
+  @Column(nullable: true)
   String? avatar;
 
   ManagedSet<Freezer>? userFreezer;
