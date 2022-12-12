@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:conduit/conduit.dart';
 import 'package:foodapi/model/recipe.dart';
 

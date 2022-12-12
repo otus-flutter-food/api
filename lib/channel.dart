@@ -74,6 +74,7 @@ class FoodapiChannel extends ApplicationChannel {
       ..route("/ingredient[/:id]").link(() => IngredientController(context))
       ..route("/measure_unit[/:id]").link(() => MeasureUnitController(context))
       ..route("/freezer[/:id]").link(() => FreezerController(context))
+      ..route("/freezers").link(() => FreezersController(context))
       ..route("/favorite[/:id]").link(() => FavoriteController(context))
       ..route("/favorites[/:id]").link(() => FavoritesController(context));
     //router.route("/user").link(() => UserController(context));
