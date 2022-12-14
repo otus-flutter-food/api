@@ -53,7 +53,7 @@ class FoodapiChannel extends ApplicationChannel {
     ];
     options?.address = "0.0.0.0";
     logger.onRecord.listen((rec) => print(
-        "Rec: ${rec.toString()} ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
+        "${rec.time.toUtc().toString()} ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
     final persistence = PostgreSQLPersistentStore(
         "admin", "root", "127.0.0.1", 5432, "postgres");
@@ -75,8 +75,8 @@ class FoodapiChannel extends ApplicationChannel {
       ..route("/measure_unit[/:id]").link(() => MeasureUnitController(context))
       ..route("/freezer[/:id]").link(() => FreezerController(context))
       ..route("/freezers").link(() => FreezersController(context))
-      ..route("/favorite[/:id]").link(() => FavoriteController(context))
-      ..route("/favorites[/:id]").link(() => FavoritesController(context));
+      ..route("/favorite[/:id]").link(() => FavoriteController(context));
+    // ..route("/favorites").link(() => FavoritesController(context));
     //router.route("/user").link(() => UserController(context));
     //router.route("/user/:id").link(() => UserInfoController(context));
 
