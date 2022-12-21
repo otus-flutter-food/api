@@ -6,6 +6,7 @@ import 'package:foodapi/controllers/auth_controller.dart';
 // import 'package:foodapi/controllers/user.dart';
 import 'package:foodapi/foodapi.dart';
 import 'package:conduit_open_api/v3.dart';
+import 'package:intl/intl.dart';
 
 import 'controllers/comment.dart';
 import 'controllers/favorite.dart';
@@ -44,6 +45,12 @@ class FoodapiChannel extends ApplicationChannel {
     );
   }
 
+  String ddMMyyyyhhmm(DateTime inputDate) {
+    final outputFormat = DateFormat('MM/dd/yyyy HH:mm');
+    final outputDate = outputFormat.format(inputDate);
+    return '${outputDate}';
+  }
+
   @override
   Future prepare() async {
     CORSPolicy.defaultPolicy.allowedOrigins = [
@@ -53,7 +60,7 @@ class FoodapiChannel extends ApplicationChannel {
     ];
     options?.address = "0.0.0.0";
     logger.onRecord.listen((rec) => print(
-        "${rec.time.toUtc().toString()} ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
+        "${rec} ${ddMMyyyyhhmm(rec.time)} ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
     final persistence = PostgreSQLPersistentStore(
         "admin", "root", "127.0.0.1", 5432, "postgres");
@@ -75,8 +82,8 @@ class FoodapiChannel extends ApplicationChannel {
       ..route("/measure_unit[/:id]").link(() => MeasureUnitController(context))
       ..route("/freezer[/:id]").link(() => FreezerController(context))
       ..route("/freezers").link(() => FreezersController(context))
-      ..route("/favorite[/:id]").link(() => FavoriteController(context));
-    // ..route("/favorites").link(() => FavoritesController(context));
+      ..route("/favorite[/:id]").link(() => FavoriteController(context))
+      ..route("/favorites[/:id]").link(() => FavoritesController(context));
     //router.route("/user").link(() => UserController(context));
     //router.route("/user/:id").link(() => UserInfoController(context));
 

@@ -17,7 +17,7 @@ class _Comment {
   @Column()
   String? text;
 
-  @Column()
+  @Column(nullable: true)
   String? photo;
 
   @Column()

@@ -29,6 +29,9 @@ class _Ingredient {
   @Column()
   String? name;
 
+  @Column()
+  double? caloriesForUnit;
+
   @Relate(#ingredients)
   MeasureUnit? measureUnit;
 
