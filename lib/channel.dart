@@ -1,5 +1,6 @@
 import 'package:conduit_common/conduit_common.dart';
 import 'package:foodapi/controllers/freezer.dart';
+import 'package:foodapi/controllers/levels.dart';
 import 'package:foodapi/controllers/token_controller.dart';
 import 'package:foodapi/controllers/user_controller.dart';
 import 'package:foodapi/controllers/auth_controller.dart';
@@ -76,14 +77,15 @@ class FoodapiChannel extends ApplicationChannel {
       ..route("/user")
           .link(() => TokenController())!
           .link(() => UserController(context))
-      ..route("/recipe[/:id]").link(() => RecipeController(context))
-      ..route("/comment[/:id]").link(() => CommentController(context))
-      ..route("/ingredient[/:id]").link(() => IngredientController(context))
-      ..route("/measure_unit[/:id]").link(() => MeasureUnitController(context))
-      ..route("/freezer[/:id]").link(() => FreezerController(context))
-      ..route("/freezers").link(() => FreezersController(context))
-      ..route("/favorite[/:id]").link(() => FavoriteController(context))
-      ..route("/favorites[/:id]").link(() => FavoritesController(context));
+      ..route("/levels").link(() => LevelController(context));
+    // ..route("/recipe[/:id]").link(() => RecipeController(context))
+    // ..route("/comment[/:id]").link(() => CommentController(context))
+    // ..route("/ingredient[/:id]").link(() => IngredientController(context))
+    // ..route("/measure_unit[/:id]").link(() => MeasureUnitController(context))
+    // ..route("/freezer[/:id]").link(() => FreezerController(context))
+    // ..route("/freezers").link(() => FreezersController(context))
+    // ..route("/favorite[/:id]").link(() => FavoriteController(context))
+    // ..route("/favorites[/:id]").link(() => FavoritesController(context));
     //router.route("/user").link(() => UserController(context));
     //router.route("/user/:id").link(() => UserInfoController(context));
 

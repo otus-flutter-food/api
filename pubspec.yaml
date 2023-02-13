@@ -4,14 +4,18 @@ version: 0.1.1
 publish_to: none
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.19.0 <3.0.0"
 
 dependencies:
-  conduit: ^3.2.10
+  conduit: ^3.2.9
   jaguar_jwt: 3.0.0
   intl: ^0.18.0
+  json_annotation: ^4.8.0
+  
   # uuid:
 
 dev_dependencies:
   test: ^1.16.5
-  conduit_test: ^3.0.0
+  conduit_test: ^3.2.9
+  build_runner: ^2.3.3
+  json_serializable: ^6.6.1

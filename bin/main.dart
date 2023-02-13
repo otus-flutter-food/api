@@ -5,7 +5,8 @@ Future main() async {
     ..options.configurationFilePath = "config.yaml"
     ..options.port = 8888;
 
-  await app.startOnCurrentIsolate();
+  await app.start(
+      numberOfInstances: 3, consoleLogging: true); // startOnCurrentIsolate();
 
   print("Application started on port: ${app.options.port}.");
   print("Use Ctrl-C (SIGINT) to stop running the application.");
