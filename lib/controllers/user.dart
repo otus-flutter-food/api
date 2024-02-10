@@ -1,13 +1,13 @@
-import 'package:conduit/conduit.dart';
 import 'package:conduit_common/conduit_common.dart';
+import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_open_api/v3.dart';
 import 'package:uuid/uuid.dart';
 
 import '../model/user.dart';
 
 class UserInfoController extends ResourceController {
-
   UserInfoController(this.context);
+
   ManagedContext context;
 
   @Operation.get("id")
@@ -20,8 +20,8 @@ class UserInfoController extends ResourceController {
 }
 
 class UserController extends ResourceController {
-
   UserController(this.context);
+
   ManagedContext context;
 
   @override

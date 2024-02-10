@@ -1,4 +1,4 @@
-import '../foodapi.dart';
+import 'package:conduit_core/conduit_core.dart';
 import 'comment.dart';
 import 'favorite.dart';
 import 'freezer.dart';

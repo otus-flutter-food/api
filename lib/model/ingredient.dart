@@ -1,4 +1,5 @@
-import '../foodapi.dart';
+import 'package:conduit_core/conduit_core.dart';
+
 import 'freezer.dart';
 import 'recipe.dart';
 
