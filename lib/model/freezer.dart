@@ -1,5 +1,5 @@
+import 'package:conduit_core/conduit_core.dart';
 
-import '../foodapi.dart';
 import 'ingredient.dart';
 import 'user.dart';
 

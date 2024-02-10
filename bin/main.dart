@@ -1,3 +1,4 @@
+import 'package:conduit_core/conduit_core.dart';
 import 'package:foodapi/foodapi.dart';
 
 Future main() async {
