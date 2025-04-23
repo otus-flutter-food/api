@@ -1,10 +1,10 @@
-FROM amd64/dart:latest
+FROM amd64/dart:3.5.2
 
 ADD . /opt/
 
 WORKDIR /opt
 
-RUN dart --verbose --dual_map_code=false pub get
+RUN dart --verbose pub get
 
 RUN chmod +x *.sh
 
