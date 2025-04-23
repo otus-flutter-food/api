@@ -52,10 +52,10 @@ class FoodapiChannel extends ApplicationChannel {
     final persistence = PostgreSQLPersistentStore(
       "food",
       "yaigoo2E",
-      "rc1b-6jiplnjx8d1kdn0a.mdb.yandexcloud.net",
-      6432,
+      "postgres",
+      5432,
       "food",
-      useSSL: true,
+      useSSL: false,
     );
     context = ManagedContext(dataModel, persistence);
   }
