@@ -3,6 +3,9 @@ FROM dart:3.5.2
 
 WORKDIR /app
 
+# Install netcat for database connectivity check
+RUN apt-get update && apt-get install -y netcat-traditional && rm -rf /var/lib/apt/lists/*
+
 # Copy pubspec files first for better caching
 COPY pubspec.* ./
 
@@ -15,9 +18,14 @@ COPY . .
 # Ensure dependencies are available
 RUN dart pub get --no-offline
 
+# Make entrypoint executable
+COPY entrypoint.sh /app/
+RUN chmod +x /app/entrypoint.sh
+
 # Expose the application port
 EXPOSE 8888
 
-# Run the server using Dart VM (JIT mode)
+# Use entrypoint to run migrations before starting the app
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["dart", "run", "bin/main.dart"]
 
