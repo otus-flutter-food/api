@@ -101,6 +101,21 @@ class FoodapiChannel extends ApplicationChannel {
         "timestamp": DateTime.now().toIso8601String()
       });
     });
+    
+    // Test POST endpoint
+    router.route("/test-post").linkFunction((request) async {
+      if (request.method != "POST") {
+        return Response(405, null, {})..headers["Allow"] = ["POST"];
+      }
+      try {
+        final body = await request.body.decode();
+        print("TEST POST received: $body");
+        return Response.ok({"received": body, "status": "ok"});
+      } catch (e) {
+        print("Error decoding body: $e");
+        return Response.badRequest(body: {"error": "Failed to decode body: $e"});
+      }
+    });
 
     return router;
   }
