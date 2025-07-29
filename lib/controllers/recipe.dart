@@ -13,12 +13,7 @@ class RecipeController extends ResourceController {
   @Operation.post()
   Future<Response> createRecipe() async {
     try {
-      // Check if request has body
-      if (!request.hasBody) {
-        return Response.badRequest(body: {"error": "Request body is required"});
-      }
-      
-      final body = await request.body.decode<Map<String, dynamic>>();
+      final body = await request!.body.decode<Map<String, dynamic>>();
       print("Received body: $body");
       
       final name = body['name'] as String?;
@@ -80,11 +75,7 @@ class RecipeController extends ResourceController {
   
   @Operation.put('id')
   Future<Response> updateRecipe(@Bind.path('id') int id) async {
-    if (!request.hasBody) {
-      return Response.badRequest(body: {"error": "Request body is required"});
-    }
-    
-    final body = await request.body.decode<Map<String, dynamic>>();
+    final body = await request!.body.decode<Map<String, dynamic>>();
     print("PUT /recipe/$id - Received body: $body");
     
     try {
