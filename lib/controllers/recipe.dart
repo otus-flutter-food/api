@@ -3,6 +3,7 @@ import 'package:conduit_postgresql/conduit_postgresql.dart';
 
 import '../model/ingredient.dart';
 import '../model/recipe.dart';
+import 'base_controller.dart';
 
 class RecipeController extends ResourceController {
   RecipeController(this.context);
@@ -71,16 +72,139 @@ class RecipeController extends ResourceController {
     
     return Response.ok(recipe);
   }
+  
+  @Operation.put('id')
+  Future<Response> updateRecipe(@Bind.path('id') int id) async {
+    final body = await request!.body.decode<Map<String, dynamic>>();
+    print("PUT /recipe/$id - Received body: $body");
+    
+    try {
+      // Проверяем существование рецепта
+      final checkQuery = Query<Recipe>(context)
+        ..where((r) => r.id).equalTo(id);
+      final existing = await checkQuery.fetchOne();
+      
+      if (existing == null) {
+        return Response.notFound();
+      }
+      
+      // Используем прямой SQL для обновления
+      final store = context.persistentStore as PostgreSQLPersistentStore;
+      final updates = <String>[];
+      final values = <String, dynamic>{'id': id};
+      
+      if (body.containsKey('name')) {
+        updates.add('name = @name');
+        values['name'] = body['name'];
+      }
+      if (body.containsKey('duration')) {
+        updates.add('duration = @duration');
+        values['duration'] = body['duration'];
+      }
+      if (body.containsKey('photo')) {
+        updates.add('photo = @photo');
+        values['photo'] = body['photo'];
+      }
+      
+      if (updates.isEmpty) {
+        return Response.badRequest(body: {"error": "No fields to update"});
+      }
+      
+      final sql = "UPDATE _recipe SET ${updates.join(', ')} WHERE id = @id RETURNING id, name, duration, photo";
+      final result = await store.execute(sql, substitutionValues: values) as List<List<dynamic>>;
+      
+      if (result.isNotEmpty && result.first.length >= 4) {
+        final row = result.first;
+        return Response.ok({
+          'id': row[0],
+          'name': row[1],
+          'duration': row[2],
+          'photo': row[3]
+        });
+      }
+      
+      return Response.serverError(body: {"error": "Failed to update recipe"});
+    } catch (e) {
+      print("Error updating recipe: $e");
+      return Response.serverError(body: {"error": e.toString()});
+    }
+  }
+  
+  @Operation.delete('id')
+  Future<Response> deleteRecipe(@Bind.path('id') int id) async {
+    try {
+      final query = Query<Recipe>(context)
+        ..where((r) => r.id).equalTo(id);
+      
+      final deletedCount = await query.delete();
+      
+      if (deletedCount == 0) {
+        return Response.notFound();
+      }
+      
+      return Response.ok({"message": "Recipe deleted successfully"});
+    } catch (e) {
+      print("Error deleting recipe: $e");
+      return Response.serverError(body: {"error": e.toString()});
+    }
+  }
 }
 
-class RecipeStepController extends ManagedObjectController<RecipeStep> {
+class RecipeStepController extends BaseController<RecipeStep> {
   RecipeStepController(ManagedContext context) : super(context);
+  
+  @override
+  String get tableName => '_recipestep';
+  
+  @override
+  List<String> get columns => ['id', 'name', 'duration'];
+  
+  @override
+  Map<String, dynamic> rowToMap(List<dynamic> row) {
+    return {
+      'id': row[0],
+      'name': row[1],
+      'duration': row[2]
+    };
+  }
 }
 
-class RecipeStepLinksController extends ManagedObjectController<RecipeStepLink> {
+class RecipeStepLinksController extends BaseController<RecipeStepLink> {
   RecipeStepLinksController(ManagedContext context) : super(context);
+  
+  @override
+  String get tableName => '_recipesteplink';
+  
+  @override
+  List<String> get columns => ['id', 'number', 'recipe_id', 'step_id'];
+  
+  @override
+  Map<String, dynamic> rowToMap(List<dynamic> row) {
+    return {
+      'id': row[0],
+      'number': row[1],
+      'recipe': row[2] != null ? {'id': row[2]} : null,
+      'step': row[3] != null ? {'id': row[3]} : null
+    };
+  }
 }
 
-class RecipeIngredientController extends ManagedObjectController<RecipeIngredient> {
+class RecipeIngredientController extends BaseController<RecipeIngredient> {
   RecipeIngredientController(ManagedContext context) : super(context);
+  
+  @override
+  String get tableName => '_recipeingredient';
+  
+  @override
+  List<String> get columns => ['id', 'count', 'ingredient_id', 'recipe_id'];
+  
+  @override
+  Map<String, dynamic> rowToMap(List<dynamic> row) {
+    return {
+      'id': row[0],
+      'count': row[1],
+      'ingredient': row[2] != null ? {'id': row[2]} : null,
+      'recipe': row[3] != null ? {'id': row[3]} : null
+    };
+  }
 }
