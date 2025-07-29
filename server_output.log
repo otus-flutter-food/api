@@ -1,0 +1,32 @@
+[SEVERE] conduit: SocketException: Failed to create server socket (OS Error: Address already in use, errno = 48), address = 0.0.0.0, port = 8888 Instance of 'Application<FoodapiChannel>' #0      _NativeSocket.bind (dart:io-patch/socket_patch.dart:1220:7)
+<asynchronous suspension>
+#1      _RawServerSocket.bind.<anonymous closure> (dart:io-patch/socket_patch.dart:2159:12)
+<asynchronous suspension>
+#2      _ServerSocket.bind.<anonymous closure> (dart:io-patch/socket_patch.dart:2514:12)
+<asynchronous suspension>
+#3      _HttpServer.bind.<anonymous closure> (dart:_http/http_impl.dart:3506:24)
+<asynchronous suspension>
+#4      ApplicationServer.start (package:conduit_core/src/application/application_server.dart:86:16)
+<asynchronous suspension>
+#5      Application.startOnCurrentIsolate (package:conduit_core/src/application/application.dart:135:7)
+<asynchronous suspension>
+#6      main (file:///Users/dmitrii/otusdemo/api/bin/main.dart:12:3)
+<asynchronous suspension>
+
+[SEVERE] conduit: Null check operator used on a null value  
+Unhandled exception:
+SocketException: Failed to create server socket (OS Error: Address already in use, errno = 48), address = 0.0.0.0, port = 8888
+#0      _NativeSocket.bind (dart:io-patch/socket_patch.dart:1220:7)
+<asynchronous suspension>
+#1      _RawServerSocket.bind.<anonymous closure> (dart:io-patch/socket_patch.dart:2159:12)
+<asynchronous suspension>
+#2      _ServerSocket.bind.<anonymous closure> (dart:io-patch/socket_patch.dart:2514:12)
+<asynchronous suspension>
+#3      _HttpServer.bind.<anonymous closure> (dart:_http/http_impl.dart:3506:24)
+<asynchronous suspension>
+#4      ApplicationServer.start (package:conduit_core/src/application/application_server.dart:86:16)
+<asynchronous suspension>
+#5      Application.startOnCurrentIsolate (package:conduit_core/src/application/application.dart:135:7)
+<asynchronous suspension>
+#6      main (file:///Users/dmitrii/otusdemo/api/bin/main.dart:12:3)
+<asynchronous suspension>

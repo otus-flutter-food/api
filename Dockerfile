@@ -1,5 +1,5 @@
 # Use single stage build to ensure dependencies are properly installed
-FROM dart:3.5.2
+FROM dart:3.5.4
 
 WORKDIR /app
 

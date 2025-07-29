@@ -98,7 +98,8 @@ class FoodapiChannel extends ApplicationChannel {
       return Response.ok({
         "status": "ok",
         "database_host": Platform.environment['DATABASE_HOST'] ?? 'localhost',
-        "timestamp": DateTime.now().toIso8601String()
+        "timestamp": DateTime.now().toIso8601String(),
+        "dart_version": Platform.version
       });
     });
     
@@ -108,12 +109,36 @@ class FoodapiChannel extends ApplicationChannel {
         return Response(405, null, {})..headers["Allow"] = ["POST"];
       }
       try {
-        final body = await request.body.decode<Map<String, dynamic>>();
-        print("TEST POST received: $body");
-        return Response.ok({"received": body, "status": "ok"});
-      } catch (e) {
+        print("=== TEST POST DEBUG ===");
+        print("Request method: ${request.method}");
+        print("Request path: ${request.path}");
+        print("Request raw: ${request.raw}");
+        print("Dart version: ${Platform.version}");
+        
+        // Try different decoding approaches
+        dynamic decodedBody;
+        try {
+          decodedBody = await request.body.decode<Map<String, dynamic>>();
+        } catch (e1) {
+          print("First decode attempt failed: $e1");
+          try {
+            decodedBody = await request.body.decode();
+          } catch (e2) {
+            print("Second decode attempt failed: $e2");
+            // Try to read raw bytes
+            final bytes = await request.body.original.toList();
+            final rawString = String.fromCharCodes(bytes.expand((x) => x));
+            print("Raw body string: $rawString");
+            decodedBody = {"raw": rawString};
+          }
+        }
+        
+        print("TEST POST received: $decodedBody");
+        return Response.ok({"received": decodedBody, "status": "ok"});
+      } catch (e, stackTrace) {
         print("Error decoding body: $e");
         print("Error type: ${e.runtimeType}");
+        print("Stack trace: $stackTrace");
         return Response.badRequest(body: {"error": "Failed to decode body: ${e.toString()}"});
       }
     });
