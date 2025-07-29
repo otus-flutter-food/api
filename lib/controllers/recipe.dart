@@ -14,36 +14,28 @@ class RecipeController extends ResourceController {
   
   @Operation.post()
   Future<Response> createRecipe() async {
+    Map<String, dynamic> body;
+    
     try {
-      Map<String, dynamic> body;
-      
-      try {
-        // Try standard decoding first
-        body = await request!.body.decode<Map<String, dynamic>>();
-      } catch (e) {
-        print("Standard decode failed: $e");
-        // Fallback to raw reading
-        try {
-          final bytes = await request!.raw.fold<List<int>>([], (previous, element) => previous..addAll(element));
-          final rawString = String.fromCharCodes(bytes);
-          print("Raw body string: $rawString");
-          body = json.decode(rawString) as Map<String, dynamic>;
-        } catch (e2) {
-          print("Raw decode also failed: $e2");
-          return Response.badRequest(body: {"error": "Unable to decode request body"});
-        }
-      }
-      
+      body = await request!.body.decode<Map<String, dynamic>>();
       print("Received body: $body");
-      
-      final name = body['name'] as String?;
-      final duration = body['duration'] as int?;
-      final photo = body['photo'] as String?;
-      
-      if (name == null || duration == null) {
-        return Response.badRequest(body: {"error": "name and duration are required"});
-      }
-      
+    } on Response catch (errorResponse) {
+      print("Decode threw Response error: ${errorResponse.statusCode}");
+      return errorResponse;
+    } catch (e) {
+      print("Unexpected error during decode: $e");
+      return Response.serverError(body: {"error": "Failed to decode request body"});
+    }
+    
+    final name = body['name'] as String?;
+    final duration = body['duration'] as int?;
+    final photo = body['photo'] as String?;
+    
+    if (name == null || duration == null) {
+      return Response.badRequest(body: {"error": "name and duration are required"});
+    }
+    
+    try {
       // Используем прямой SQL запрос из-за проблемы с типами в Conduit
       final store = context.persistentStore as PostgreSQLPersistentStore;
       final conn = await store.execute(
@@ -95,8 +87,18 @@ class RecipeController extends ResourceController {
   
   @Operation.put('id')
   Future<Response> updateRecipe(@Bind.path('id') int id) async {
-    final body = await request!.body.decode<Map<String, dynamic>>();
-    print("PUT /recipe/$id - Received body: $body");
+    Map<String, dynamic> body;
+    
+    try {
+      body = await request!.body.decode<Map<String, dynamic>>();
+      print("PUT /recipe/$id - Received body: $body");
+    } on Response catch (errorResponse) {
+      print("PUT decode threw Response error: ${errorResponse.statusCode}");
+      return errorResponse;
+    } catch (e) {
+      print("PUT unexpected error during decode: $e");
+      return Response.serverError(body: {"error": "Failed to decode request body"});
+    }
     
     try {
       // Проверяем существование рецепта
