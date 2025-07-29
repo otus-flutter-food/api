@@ -1,22 +1,19 @@
-# Build stage
-FROM dart:3.5.2 AS builder
+# Use single stage build to ensure dependencies are properly installed
+FROM dart:3.5.2
 
 WORKDIR /app
 
 # Copy pubspec files first for better caching
 COPY pubspec.* ./
-RUN dart pub get
+
+# Get dependencies with verbose output for debugging
+RUN dart pub get --no-offline --verbose
 
 # Copy all source files
 COPY . .
 
-# Runtime stage - use the same dart image
-FROM dart:3.5.2
-
-WORKDIR /app
-
-# Copy application from builder
-COPY --from=builder /app /app
+# Ensure dependencies are available
+RUN dart pub get --no-offline
 
 # Expose the application port
 EXPOSE 8888
