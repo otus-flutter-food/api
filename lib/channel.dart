@@ -92,6 +92,15 @@ class FoodapiChannel extends ApplicationChannel {
     router.route("/favorite[/:id]").link(() => FavoriteController(context));
     router.route("/user").link(() => UserController(context));
     router.route("/user/:id").link(() => UserInfoController(context));
+    
+    // Test endpoint
+    router.route("/test").linkFunction((request) async {
+      return Response.ok({
+        "status": "ok",
+        "database_host": Platform.environment['DATABASE_HOST'] ?? 'localhost',
+        "timestamp": DateTime.now().toIso8601String()
+      });
+    });
 
     return router;
   }
