@@ -30,7 +30,7 @@ class _Ingredient {
   @Column()
   String? name;
 
-  @Column()
+  @Column(name: "calories_for_unit")
   double? caloriesForUnit;
 
   @Relate(#ingredients)

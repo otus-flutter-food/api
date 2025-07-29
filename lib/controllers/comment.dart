@@ -8,17 +8,33 @@ class CommentController extends BaseController<Comment> {
   CommentController(ManagedContext context) : super(context);
   
   @override
+  @Operation.get()
+  Future<Response> getAll() async {
+    try {
+      final store = context.persistentStore as PostgreSQLPersistentStore;
+      final sql = 'SELECT id, text, date_time, photo, user_id, recipe_id FROM _comment';
+      final result = await store.execute(sql) as List<List<dynamic>>;
+      
+      final comments = result.map((row) => rowToMap(row)).toList();
+      return Response.ok(comments);
+    } catch (e) {
+      print("Error fetching comments: $e");
+      return Response.serverError(body: {"error": e.toString()});
+    }
+  }
+  
+  @override
   String get tableName => '_comment';
   
   @override
-  List<String> get columns => ['id', 'text', 'dateTime', 'photo', 'user_id', 'recipe_id'];
+  List<String> get columns => ['id', 'text', 'date_time', 'photo', 'user_id', 'recipe_id'];
   
   @override
   Map<String, dynamic> rowToMap(List<dynamic> row) {
     return {
       'id': row[0],
       'text': row[1],
-      'datetime': row[2]?.toIso8601String(),
+      'dateTime': row[2]?.toIso8601String(),
       'photo': row[3],
       'user': row[4] != null ? {'id': row[4]} : null,
       'recipe': row[5] != null ? {'id': row[5]} : null
@@ -41,7 +57,7 @@ class CommentController extends BaseController<Comment> {
       }
       
       values['text'] = body['text'];
-      values['dateTime'] = body['datetime'] ?? DateTime.now().toIso8601String();
+      values['date_time'] = body['dateTime'] ?? body['datetime'] ?? DateTime.now().toIso8601String();
       
       // Optional fields
       if (body.containsKey('photo')) {
@@ -61,8 +77,8 @@ class CommentController extends BaseController<Comment> {
         }
       }
       
-      final columns = ['text', '"dateTime"'];
-      final valueNames = ['@text', '@dateTime'];
+      final columns = ['text', 'date_time'];
+      final valueNames = ['@text', '@date_time'];
       
       if (values.containsKey('photo')) {
         columns.add('photo');
@@ -77,7 +93,7 @@ class CommentController extends BaseController<Comment> {
         valueNames.add('@recipe_id');
       }
       
-      final sql = "INSERT INTO _comment (${columns.join(', ')}) VALUES (${valueNames.join(', ')}) RETURNING id, text, \"dateTime\", photo, user_id, recipe_id";
+      final sql = "INSERT INTO _comment (${columns.join(', ')}) VALUES (${valueNames.join(', ')}) RETURNING id, text, date_time, photo, user_id, recipe_id";
       final result = await store.execute(sql, substitutionValues: values) as List<List<dynamic>>;
       
       if (result.isNotEmpty) {
