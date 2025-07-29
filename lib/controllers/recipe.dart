@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_postgresql/conduit_postgresql.dart';
 
@@ -13,7 +15,25 @@ class RecipeController extends ResourceController {
   @Operation.post()
   Future<Response> createRecipe() async {
     try {
-      final body = await request!.body.decode<Map<String, dynamic>>();
+      Map<String, dynamic> body;
+      
+      try {
+        // Try standard decoding first
+        body = await request!.body.decode<Map<String, dynamic>>();
+      } catch (e) {
+        print("Standard decode failed: $e");
+        // Fallback to raw reading
+        try {
+          final bytes = await request!.raw.fold<List<int>>([], (previous, element) => previous..addAll(element));
+          final rawString = String.fromCharCodes(bytes);
+          print("Raw body string: $rawString");
+          body = json.decode(rawString) as Map<String, dynamic>;
+        } catch (e2) {
+          print("Raw decode also failed: $e2");
+          return Response.badRequest(body: {"error": "Unable to decode request body"});
+        }
+      }
+      
       print("Received body: $body");
       
       final name = body['name'] as String?;

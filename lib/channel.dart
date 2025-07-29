@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:conduit_common/conduit_common.dart';
@@ -103,6 +104,27 @@ class FoodapiChannel extends ApplicationChannel {
       });
     });
     
+    // Test POST endpoint with raw body handling
+    router.route("/test-post-raw").linkFunction((request) async {
+      if (request.method != "POST") {
+        return Response(405, null, {})..headers["Allow"] = ["POST"];
+      }
+      
+      try {
+        // Read raw body
+        final bytes = await request.raw.fold<List<int>>([], (previous, element) => previous..addAll(element));
+        final rawString = String.fromCharCodes(bytes);
+        print("Raw body received: $rawString");
+        
+        // Parse JSON manually
+        final parsed = json.decode(rawString);
+        return Response.ok({"received": parsed, "status": "ok", "method": "raw"});
+      } catch (e) {
+        print("Error in raw processing: $e");
+        return Response.badRequest(body: {"error": "Raw processing failed: ${e.toString()}"});
+      }
+    });
+
     // Test POST endpoint
     router.route("/test-post").linkFunction((request) async {
       if (request.method != "POST") {
