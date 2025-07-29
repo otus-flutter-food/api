@@ -172,20 +172,16 @@ class FoodapiChannel extends ApplicationChannel {
         print("Request raw: ${request.raw}");
         print("Dart version: ${Platform.version}");
         
-        // Try different decoding approaches
+        // In Conduit, decode() throws Response on error
         dynamic decodedBody;
         try {
           decodedBody = await request.body.decode<Map<String, dynamic>>();
-        } catch (e1) {
-          print("First decode attempt failed: $e1");
-          try {
-            decodedBody = await request.body.decode();
-          } catch (e2) {
-            print("Second decode attempt failed: $e2");
-            // In Conduit 4.4.0, we can't access original stream
-            print("Unable to read raw body in Conduit 4.4.0");
-            return Response.badRequest(body: {"error": "Failed to decode body"});
-          }
+        } on Response catch (errorResponse) {
+          print("Decode threw Response: ${errorResponse.statusCode} - ${errorResponse.body}");
+          return errorResponse;
+        } catch (e) {
+          print("Unexpected error: $e (${e.runtimeType})");
+          return Response.serverError(body: {"error": "Unexpected error during decode"});
         }
         
         print("TEST POST received: $decodedBody");
