@@ -10,8 +10,8 @@ RUN dart pub get
 # Copy all source files
 COPY . .
 
-# Runtime stage
-FROM dart:3.5.2-slim
+# Runtime stage - use the same dart image
+FROM dart:3.5.2
 
 WORKDIR /app
 
