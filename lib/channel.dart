@@ -104,6 +104,41 @@ class FoodapiChannel extends ApplicationChannel {
       });
     });
     
+    // Debug endpoint to see what exactly arrives
+    router.route("/debug-post").linkFunction((request) async {
+      print("\n=== DEBUG POST REQUEST ===");
+      print("Method: ${request.method}");
+      print("Path: ${request.path}");
+      print("Content-Length header: ${request.raw.headers.value('content-length')}");
+      print("Content-Type header: ${request.raw.headers.value('content-type')}");
+      print("All headers: ${request.raw.headers}");
+      
+      try {
+        // Try to read raw bytes
+        final bytes = await request.raw.fold<List<int>>([], (previous, element) => previous..addAll(element));
+        print("Bytes received: ${bytes.length}");
+        print("Bytes as list: $bytes");
+        
+        final rawString = String.fromCharCodes(bytes);
+        print("Raw string: '$rawString'");
+        print("Raw string length: ${rawString.length}");
+        
+        return Response.ok({
+          "bytes_length": bytes.length,
+          "raw_string": rawString,
+          "headers": request.raw.headers.toString(),
+          "content_length": request.raw.headers.value('content-length'),
+          "content_type": request.raw.headers.value('content-type')
+        });
+      } catch (e) {
+        print("Error reading body: $e");
+        return Response.ok({
+          "error": e.toString(),
+          "headers": request.raw.headers.toString()
+        });
+      }
+    });
+
     // Test POST endpoint with raw body handling
     router.route("/test-post-raw").linkFunction((request) async {
       if (request.method != "POST") {
@@ -147,11 +182,9 @@ class FoodapiChannel extends ApplicationChannel {
             decodedBody = await request.body.decode();
           } catch (e2) {
             print("Second decode attempt failed: $e2");
-            // Try to read raw bytes
-            final bytes = await request.body.original.toList();
-            final rawString = String.fromCharCodes(bytes.expand((x) => x));
-            print("Raw body string: $rawString");
-            decodedBody = {"raw": rawString};
+            // In Conduit 4.4.0, we can't access original stream
+            print("Unable to read raw body in Conduit 4.4.0");
+            return Response.badRequest(body: {"error": "Failed to decode body"});
           }
         }
         
