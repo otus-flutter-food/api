@@ -12,18 +12,23 @@ class RecipeController extends ResourceController {
   
   @Operation.post()
   Future<Response> createRecipe() async {
-    final body = await request!.body.decode<Map<String, dynamic>>();
-    print("Received body: $body");
-    
-    final name = body['name'] as String?;
-    final duration = body['duration'] as int?;
-    final photo = body['photo'] as String?;
-    
-    if (name == null || duration == null) {
-      return Response.badRequest(body: {"error": "name and duration are required"});
-    }
-    
     try {
+      // Check if request has body
+      if (!request.hasBody) {
+        return Response.badRequest(body: {"error": "Request body is required"});
+      }
+      
+      final body = await request.body.decode<Map<String, dynamic>>();
+      print("Received body: $body");
+      
+      final name = body['name'] as String?;
+      final duration = body['duration'] as int?;
+      final photo = body['photo'] as String?;
+      
+      if (name == null || duration == null) {
+        return Response.badRequest(body: {"error": "name and duration are required"});
+      }
+      
       // Используем прямой SQL запрос из-за проблемы с типами в Conduit
       final store = context.persistentStore as PostgreSQLPersistentStore;
       final conn = await store.execute(
@@ -75,7 +80,11 @@ class RecipeController extends ResourceController {
   
   @Operation.put('id')
   Future<Response> updateRecipe(@Bind.path('id') int id) async {
-    final body = await request!.body.decode<Map<String, dynamic>>();
+    if (!request.hasBody) {
+      return Response.badRequest(body: {"error": "Request body is required"});
+    }
+    
+    final body = await request.body.decode<Map<String, dynamic>>();
     print("PUT /recipe/$id - Received body: $body");
     
     try {
