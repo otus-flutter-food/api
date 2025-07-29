@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS "_recipe" (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR NOT NULL,
     duration INTEGER NOT NULL,
-    photo VARCHAR NOT NULL
+    photo VARCHAR NULL
 );
 
 CREATE TABLE IF NOT EXISTS "_recipestep" (
