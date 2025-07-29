@@ -5,3 +5,4 @@ Received body: {name: Борщ украинский, duration: 180, photo: https
 [INFO] conduit: PostgreSQL connecting, food@192.162.246.40:5432/food.  
 [INFO] conduit: POST /recipe 2701ms 200   
 [INFO] conduit: GET /recipe 115ms 200   
+[INFO] conduit: POST /debug-post 3ms 404   

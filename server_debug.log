@@ -1,0 +1,5 @@
+lib/channel.dart:186:46: Error: The getter 'original' isn't defined for the class 'RequestBody'.
+ - 'RequestBody' is from 'package:conduit_core/src/http/request_body.dart' ('../../.pub-cache/hosted/pub.dev/conduit_core-4.4.0/lib/src/http/request_body.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'original'.
+            final bytes = await request.body.original.toList();
+                                             ^^^^^^^^
