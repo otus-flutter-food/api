@@ -21,6 +21,6 @@ class _Comment {
   @Column(nullable: true)
   String? photo;
 
-  @Column()
-  DateTime? datetime;
+  @Column(name: "date_time")
+  DateTime? dateTime;
 }

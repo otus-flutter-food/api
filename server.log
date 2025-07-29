@@ -1,69 +1,8 @@
 [INFO] conduit: Server conduit/1 started.  
-Application started on 0.0.0.0:8890.
+Application started on 0.0.0.0:8897.
 Use Ctrl-C (SIGINT) to stop running the application.
-[INFO] conduit: POST /recipe 7ms 405   
-[INFO] conduit: GET /test 1ms 200   
-[INFO] conduit: GET /test 0ms 200   
-1
-* IPv4: 127.0.0.1
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:8890...
-* connect to ::1 port 8890 from ::1 port 55934 failed: Connection refused
-*   Trying 127.0.0.1:8890...
-* Connected to localhost (127.0.0.1) port 8890
-> POST /recipe HTTP/1.1
-> Host: localhost:8890
-> User-Agent: curl/8.7.1
-> Accept: */*
-> Content-Type: application/json
-> Content-Length: 61
-> 
-} [61 bytes data]
-* upload completely sent off: 61 bytes
-< HTTP/1.1 405 Method Not Allowed
-< content-length: 0
-< x-frame-options: SAMEORIGIN
-< x-xss-protection: 1; mode=block
-< x-content-type-options: nosniff
-< server: conduit/1
-< allow: GET
-< 
-100    61    0     0  100    61      0   1963 --:--:-- --:--:-- --:--:--  1967
-* Connection #0 to host localhost left intact
-[INFO] conduit: Server conduit/1 started.  
-Application started on 0.0.0.0:8892.
-Use Ctrl-C (SIGINT) to stop running the application.
-TEST POST received: {name: Test, duration: 30}
-[INFO] conduit: POST /test-post 12ms 200   
+PUT /_comment/1 - Received body: {text: Debug columns}
 [INFO] conduit: PostgreSQL connecting, food@192.162.246.40:5432/food.  
-[WARNING] conduit: PostgreSQLSeverity.error : Specified parameter types do not match column parameter types in query INSERT INTO _Recipe (duration,name) VALUES (@v_duration:int4,@v_name:text) RETURNING id,name,duration,photo   
-[SEVERE] conduit: POST /recipe 857ms 500 {user-agent : curl/8.7.1\ncontent-type : application/json\naccept : */*\ncontent-length : 36\nhost : localhost:8892\n}  PostgreSQLSeverity.error : Specified parameter types do not match column parameter types in query INSERT INTO _Recipe (duration,name) VALUES (@v_duration:int4,@v_name:text) RETURNING id,name,duration,photo  #0      _PostgreSQLExecutionContextMixin._query (package:postgres/src/connection.dart:520:18)
-#1      _PostgreSQLExecutionContextMixin.query (package:postgres/src/connection.dart:481:7)
-#2      PostgreSQLPersistentStore.executeQuery (package:conduit_postgresql/src/postgresql_persistent_store.dart:332:39)
-<asynchronous suspension>
-#3      PostgresQuery.insert (package:conduit_postgresql/src/postgresql_query.dart:46:21)
-<asynchronous suspension>
-#4      ManagedObjectController.createObject (package:conduit_core/src/http/managed_object_controller.dart:138:34)
-<asynchronous suspension>
-#5      ResourceController._process (package:conduit_core/src/http/resource_controller.dart:388:22)
-<asynchronous suspension>
-#6      Controller.receive (package:conduit_core/src/http/controller.dart:162:24)
-<asynchronous suspension>
-
-[INFO] conduit: Server conduit/1 started.  
-Application started on 0.0.0.0:8894.
-Use Ctrl-C (SIGINT) to stop running the application.
-Received body: {name: Test Recipe Custom, duration: 45}
-[INFO] conduit: PostgreSQL connecting, food@192.162.246.40:5432/food.  
-[WARNING] conduit: PostgreSQLSeverity.error : Specified parameter types do not match column parameter types in query INSERT INTO _Recipe (photo,duration,name) VALUES (@v_photo:text,@v_duration:int4,@v_name:text) RETURNING id,name,duration,photo   
-Error inserting recipe: PostgreSQLSeverity.error : Specified parameter types do not match column parameter types in query INSERT INTO _Recipe (photo,duration,name) VALUES (@v_photo:text,@v_duration:int4,@v_name:text) RETURNING id,name,duration,photo 
-[INFO] conduit: POST /recipe 820ms 500   
-Received body: {name: Test Recipe Custom, duration: 45, photo: null}
-[WARNING] conduit: PostgreSQLSeverity.error : Specified parameter types do not match column parameter types in query INSERT INTO _Recipe (photo,duration,name) VALUES (@v_photo:text,@v_duration:int4,@v_name:text) RETURNING id,name,duration,photo   
-Error inserting recipe: PostgreSQLSeverity.error : Specified parameter types do not match column parameter types in query INSERT INTO _Recipe (photo,duration,name) VALUES (@v_photo:text,@v_duration:int4,@v_name:text) RETURNING id,name,duration,photo 
-[INFO] conduit: POST /recipe 81ms 500   
-Received body: {name: Test Recipe After Migration, duration: 60}
-[WARNING] conduit: PostgreSQLSeverity.error : Specified parameter types do not match column parameter types in query INSERT INTO _Recipe (photo,duration,name) VALUES (@v_photo:text,@v_duration:int4,@v_name:text) RETURNING id,name,duration,photo   
-Error inserting recipe: PostgreSQLSeverity.error : Specified parameter types do not match column parameter types in query INSERT INTO _Recipe (photo,duration,name) VALUES (@v_photo:text,@v_duration:int4,@v_name:text) RETURNING id,name,duration,photo 
-[INFO] conduit: POST /recipe 1269ms 500   
+[WARNING] conduit: PostgreSQLSeverity.error 42703: column "datetime" does not exist Hint: Perhaps you meant to reference the column "_comment.dateTime".   
+Error updating: PostgreSQLSeverity.error 42703: column "datetime" does not exist Hint: Perhaps you meant to reference the column "_comment.dateTime". 
+[INFO] conduit: PUT /comment/1 643ms 500   

@@ -10,6 +10,19 @@ abstract class BaseController<T extends ManagedObject> extends ResourceControlle
   List<String> get columns;
   Map<String, dynamic> rowToMap(List<dynamic> row);
   
+  // Метод для получения правильного имени колонки в SQL
+  String getColumnName(String key) {
+    // measureUnit_id все еще требует кавычек из-за camelCase
+    const quotedColumns = ['measureUnit_id'];
+    return quotedColumns.contains(key) ? '"$key"' : key;
+  }
+  
+  // Метод для получения имени параметра (для substitutionValues)
+  String getParamName(String key) {
+    // Используем имя как есть, так как все в snake_case
+    return key;
+  }
+  
   @Operation.post()
   Future<Response> create() async {
     final body = await request!.body.decode<Map<String, dynamic>>();
@@ -23,9 +36,10 @@ abstract class BaseController<T extends ManagedObject> extends ResourceControlle
       
       body.forEach((key, value) {
         if (columns.contains(key) && key != 'id') {
-          columnNames.add(key);
-          valueNames.add('@$key');
-          values[key] = value;
+          final paramName = getParamName(key);
+          columnNames.add(getColumnName(key));
+          valueNames.add('@$paramName');
+          values[paramName] = value;
         }
       });
       
@@ -33,7 +47,8 @@ abstract class BaseController<T extends ManagedObject> extends ResourceControlle
         return Response.badRequest(body: {"error": "No valid fields provided"});
       }
       
-      final sql = "INSERT INTO $tableName (${columnNames.join(', ')}) VALUES (${valueNames.join(', ')}) RETURNING ${columns.join(', ')}";
+      final returningColumns = columns.map((col) => getColumnName(col)).join(', ');
+      final sql = "INSERT INTO $tableName (${columnNames.join(', ')}) VALUES (${valueNames.join(', ')}) RETURNING $returningColumns";
       final result = await store.execute(sql, substitutionValues: values) as List<List<dynamic>>;
       
       if (result.isNotEmpty) {
@@ -89,8 +104,9 @@ abstract class BaseController<T extends ManagedObject> extends ResourceControlle
       
       body.forEach((key, value) {
         if (columns.contains(key) && key != 'id') {
-          updates.add('$key = @$key');
-          values[key] = value;
+          final paramName = getParamName(key);
+          updates.add('${getColumnName(key)} = @$paramName');
+          values[paramName] = value;
         }
       });
       
@@ -98,7 +114,8 @@ abstract class BaseController<T extends ManagedObject> extends ResourceControlle
         return Response.badRequest(body: {"error": "No fields to update"});
       }
       
-      final sql = "UPDATE $tableName SET ${updates.join(', ')} WHERE id = @id RETURNING ${columns.join(', ')}";
+      final returningColumns = columns.map((col) => getColumnName(col)).join(', ');
+      final sql = "UPDATE $tableName SET ${updates.join(', ')} WHERE id = @id RETURNING $returningColumns";
       final result = await store.execute(sql, substitutionValues: values) as List<List<dynamic>>;
       
       if (result.isNotEmpty) {
