@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:conduit_common/conduit_common.dart';
 import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_open_api/v3.dart';
@@ -49,12 +51,19 @@ class FoodapiChannel extends ApplicationChannel {
     logger.onRecord.listen(
         (rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
+    
+    final dbHost = Platform.environment['DATABASE_HOST'] ?? 'localhost';
+    final dbPort = int.parse(Platform.environment['DATABASE_PORT'] ?? '5432');
+    final dbUser = Platform.environment['DATABASE_USER'] ?? 'food';
+    final dbPassword = Platform.environment['DATABASE_PASSWORD'] ?? 'yaigoo2E';
+    final dbName = Platform.environment['DATABASE_NAME'] ?? 'food';
+    
     final persistence = PostgreSQLPersistentStore(
-      "food",
-      "yaigoo2E",
-      "192.162.246.40",
-      5432,
-      "food",
+      dbUser,
+      dbPassword,
+      dbHost,
+      dbPort,
+      dbName,
       useSSL: false,
     );
     context = ManagedContext(dataModel, persistence);
