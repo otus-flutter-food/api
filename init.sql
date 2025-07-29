@@ -1,0 +1,85 @@
+-- Drop existing tables
+DROP TABLE IF EXISTS "_Comment" CASCADE;
+DROP TABLE IF EXISTS "_Favorite" CASCADE;
+DROP TABLE IF EXISTS "_Freezer" CASCADE;
+DROP TABLE IF EXISTS "_RecipeIngredient" CASCADE;
+DROP TABLE IF EXISTS "_RecipeStepLink" CASCADE;
+DROP TABLE IF EXISTS "_Recipe" CASCADE;
+DROP TABLE IF EXISTS "_RecipeStep" CASCADE;
+DROP TABLE IF EXISTS "_Ingredient" CASCADE;
+DROP TABLE IF EXISTS "_MeasureUnit" CASCADE;
+DROP TABLE IF EXISTS "_User" CASCADE;
+
+-- Create tables with lowercase names
+CREATE TABLE IF NOT EXISTS "_user" (
+    id BIGSERIAL PRIMARY KEY,
+    "firstName" VARCHAR NOT NULL,
+    "lastName" VARCHAR NOT NULL,
+    phone VARCHAR NOT NULL,
+    "avatarUrl" VARCHAR NOT NULL,
+    token VARCHAR NULL,
+    birthday DATE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "_recipe" (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    duration INTEGER NOT NULL,
+    photo VARCHAR NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "_recipestep" (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    duration INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "_recipesteplink" (
+    id BIGSERIAL PRIMARY KEY,
+    number INTEGER NOT NULL,
+    recipe_id BIGINT REFERENCES "_recipe"(id) ON DELETE SET NULL,
+    step_id BIGINT REFERENCES "_recipestep"(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS "_measureunit" (
+    id BIGSERIAL PRIMARY KEY,
+    one VARCHAR NOT NULL,
+    few VARCHAR NOT NULL,
+    many VARCHAR NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "_ingredient" (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    "caloriesForUnit" DOUBLE PRECISION NOT NULL,
+    "measureUnit_id" BIGINT REFERENCES "_measureunit"(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS "_recipeingredient" (
+    id BIGSERIAL PRIMARY KEY,
+    count INTEGER NOT NULL,
+    ingredient_id BIGINT REFERENCES "_ingredient"(id) ON DELETE SET NULL,
+    recipe_id BIGINT REFERENCES "_recipe"(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS "_freezer" (
+    id BIGSERIAL PRIMARY KEY,
+    count INTEGER NOT NULL,
+    user_id BIGINT REFERENCES "_user"(id) ON DELETE SET NULL,
+    ingredient_id BIGINT REFERENCES "_ingredient"(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS "_comment" (
+    id BIGSERIAL PRIMARY KEY,
+    text VARCHAR NOT NULL,
+    "dateTime" TIMESTAMP NOT NULL,
+    photo VARCHAR NULL,
+    user_id BIGINT REFERENCES "_user"(id) ON DELETE SET NULL,
+    recipe_id BIGINT REFERENCES "_recipe"(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS "_favorite" (
+    id BIGSERIAL PRIMARY KEY,
+    recipe_id BIGINT REFERENCES "_recipe"(id) ON DELETE SET NULL,
+    user_id BIGINT REFERENCES "_user"(id) ON DELETE SET NULL
+);

@@ -52,7 +52,7 @@ class FoodapiChannel extends ApplicationChannel {
     final persistence = PostgreSQLPersistentStore(
       "food",
       "yaigoo2E",
-      "postgres",
+      "192.162.246.40",
       5432,
       "food",
       useSSL: false,

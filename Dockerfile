@@ -1,12 +1,39 @@
-FROM amd64/dart:3.5.2
+# Build stage
+FROM dart:3.5.2 AS builder
 
-ADD . /opt/
+WORKDIR /app
 
-WORKDIR /opt
+# Copy pubspec files first for better caching
+COPY pubspec.* ./
+RUN dart pub get
 
-RUN dart --verbose pub get
+# Copy all source files
+COPY . .
 
-RUN chmod +x *.sh
+# Compile the server
+RUN dart compile exe bin/main.dart -o bin/server
 
-CMD dart bin/main.dart
+# Runtime stage
+FROM debian:bookworm-slim
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy compiled server and necessary files
+COPY --from=builder /app/bin/server /app/bin/server
+COPY --from=builder /app/config.yaml /app/config.yaml
+COPY --from=builder /app/*.sh /app/
+
+# Make scripts executable
+RUN chmod +x /app/*.sh 2>/dev/null || true
+
+# Expose the application port
+EXPOSE 8888
+
+# Run the compiled server
+CMD ["/app/bin/server"]
 
