@@ -9,6 +9,6 @@ Future main() async {
 
   await app.startOnCurrentIsolate();
 
-  print("Application started on ${app.options.address.address}:${app.options.port}.");
+  print("Application started on 0.0.0.0:${app.options.port}.");
   print("Use Ctrl-C (SIGINT) to stop running the application.");
 }
