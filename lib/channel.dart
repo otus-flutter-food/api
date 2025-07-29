@@ -108,17 +108,9 @@ class FoodapiChannel extends ApplicationChannel {
         return Response(405, null, {})..headers["Allow"] = ["POST"];
       }
       try {
-        print("TEST POST headers: ${request.headers}");
-        print("TEST POST contentType: ${request.contentType}");
-        print("TEST POST hasBody: ${request.hasBody}");
-        
-        if (request.hasBody) {
-          final body = await request.body.decode<Map<String, dynamic>>();
-          print("TEST POST received: $body");
-          return Response.ok({"received": body, "status": "ok"});
-        } else {
-          return Response.ok({"received": null, "status": "ok"});
-        }
+        final body = await request.body.decode<Map<String, dynamic>>();
+        print("TEST POST received: $body");
+        return Response.ok({"received": body, "status": "ok"});
       } catch (e) {
         print("Error decoding body: $e");
         print("Error type: ${e.runtimeType}");
