@@ -73,6 +73,18 @@ class FoodapiChannel extends ApplicationChannel {
   @override
   Controller get entryPoint {
     final router = Router();
+    
+    // Logging middleware
+    router.route("/[:path(.*)]")
+      .linkFunction((request) async {
+        print("\n[${DateTime.now().toIso8601String()}] ${request.method} ${request.path.string}");
+        print("Headers: ${request.raw.headers}");
+        if (request.method == "POST" || request.method == "PUT") {
+          print("Has body: ${request.hasBody}");
+          print("Content-Length: ${request.raw.headers.value('content-length')}");
+        }
+        return request;
+      });
 
     router.route("/recipe[/:id]").link(() => RecipeController(context));
     router
@@ -111,7 +123,10 @@ class FoodapiChannel extends ApplicationChannel {
       print("Path: ${request.path}");
       print("Content-Length header: ${request.raw.headers.value('content-length')}");
       print("Content-Type header: ${request.raw.headers.value('content-type')}");
+      print("Transfer-Encoding: ${request.raw.headers.value('transfer-encoding')}");
+      print("Connection: ${request.raw.headers.value('connection')}");
       print("All headers: ${request.raw.headers}");
+      print("Has body: ${request.hasBody}");
       
       try {
         // Try to read raw bytes
