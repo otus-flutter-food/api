@@ -80,7 +80,7 @@ class FoodapiChannel extends ApplicationChannel {
         print("\n[${DateTime.now().toIso8601String()}] ${request.method} ${request.path.string}");
         print("Headers: ${request.raw.headers}");
         if (request.method == "POST" || request.method == "PUT") {
-          print("Has body: ${request.hasBody}");
+          // print("Has body: ${request.hasBody}"); // Not available in Conduit 4.4.0
           print("Content-Length: ${request.raw.headers.value('content-length')}");
         }
         return request;
@@ -126,7 +126,7 @@ class FoodapiChannel extends ApplicationChannel {
       print("Transfer-Encoding: ${request.raw.headers.value('transfer-encoding')}");
       print("Connection: ${request.raw.headers.value('connection')}");
       print("All headers: ${request.raw.headers}");
-      print("Has body: ${request.hasBody}");
+      // print("Has body: ${request.hasBody}"); // Not available in Conduit 4.4.0
       
       try {
         // Try to read raw bytes
