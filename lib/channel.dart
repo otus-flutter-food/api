@@ -13,6 +13,10 @@ import 'controllers/comment.dart';
 import 'controllers/favorite.dart';
 import 'controllers/ingredient.dart';
 import 'controllers/recipe.dart';
+import 'controller/recipe_step_controller.dart' as new_controllers;
+import 'controller/recipe_step_link_controller.dart' as new_controllers;
+import 'controller/recipe_ingredient_controller.dart' as new_controllers;
+import 'controller/comment_controller.dart' as new_controllers;
 
 class FoodapiChannel extends ApplicationChannel {
   late ManagedContext context;
@@ -87,6 +91,28 @@ class FoodapiChannel extends ApplicationChannel {
       });
 
     router.route("/recipe[/:id]").link(() => RecipeController(context));
+    
+    // Recipe Steps
+    router.route("/steps[/:id]").link(() => new_controllers.RecipeStepController(context));
+    router.route("/steps/search").link(() => new_controllers.RecipeStepController(context));
+    
+    // Recipe Step Links
+    router.route("/recipe-step-links[/:id]").link(() => new_controllers.RecipeStepLinkController(context));
+    router.route("/recipe-step-links/recipe/:recipeId").link(() => new_controllers.RecipeStepLinkController(context));
+    router.route("/recipe-step-links/batch").link(() => new_controllers.RecipeStepLinkController(context));
+    router.route("/recipe-step-links/reorder").link(() => new_controllers.RecipeStepLinkController(context));
+    
+    // Recipe Ingredients  
+    router.route("/recipe-ingredients[/:id]").link(() => new_controllers.RecipeIngredientController(context));
+    router.route("/recipe-ingredients/batch").link(() => new_controllers.RecipeIngredientController(context));
+    router.route("/recipe-ingredients/recipe/:recipeId").link(() => new_controllers.RecipeIngredientController(context));
+    
+    // Comments (new endpoints)
+    router.route("/comments[/:id]").link(() => new_controllers.CommentController(context));
+    router.route("/comments/recipe/:recipeId").link(() => new_controllers.CommentController(context));
+    router.route("/comments/user/:userId").link(() => new_controllers.CommentController(context));
+    
+    // Original endpoints (keeping for backward compatibility)
     router
         .route("/recipe_step[/:id]")
         .link(() => RecipeStepController(context));
