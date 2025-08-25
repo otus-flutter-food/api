@@ -83,7 +83,7 @@ lib/
 Response: [
   {
     "id": 1,
-    "name": "Борщ",
+    "name": "Грибной суп",
     "duration": 3600,
     "photo": "url_to_photo"
   }
@@ -115,7 +115,7 @@ Request: {
 Обновить рецепт
 ```json
 Request: {
-  "name": "Украинский борщ",
+  "name": "Грибной суп с овощами",
   "duration": 4200
 }
 ```
