@@ -97,3 +97,7 @@ doc/api/
 .flutter-plugins
 .flutter-plugins-dependencies
 
+# Database backups and custom migrations
+backup*.sql
+migration*.sql
+

@@ -55,7 +55,13 @@ class UserController extends ResourceController {
     }
     final newUser = Query<User>(context)
       ..values.login = user.login
-      ..values.password = user.password;
+      ..values.password = user.password
+      // Add profile fields if provided
+      ..values.firstName = user.firstName
+      ..values.lastName = user.lastName
+      ..values.phone = user.phone
+      ..values.avatarUrl = user.avatarUrl
+      ..values.birthday = user.birthday;
     await newUser.insert();
     return Response.ok({'status': 'ok'});
   }
@@ -66,7 +72,7 @@ class UserController extends ResourceController {
       ..where((x) => x.login).equalTo(user.login)
       ..where((x) => x.password).equalTo(user.password);
     final registered = await query.fetchOne();
-    final token = const Uuid().v4.toString();
+    final token = const Uuid().v4();
     query.values.token = token;
     await query.updateOne();
 

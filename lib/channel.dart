@@ -12,11 +12,19 @@ import 'package:foodapi/foodapi.dart';
 import 'controllers/comment.dart';
 import 'controllers/favorite.dart';
 import 'controllers/ingredient.dart';
-import 'controllers/recipe.dart';
+import 'controllers/recipe.dart' as old_recipe;
+import 'controllers/recipe_new.dart';
+import 'controllers/user_profile_controller.dart';
+import 'middleware/auth_middleware.dart';
 import 'controller/recipe_step_controller.dart' as new_controllers;
 import 'controller/recipe_step_link_controller.dart' as new_controllers;
 import 'controller/recipe_ingredient_controller.dart' as new_controllers;
 import 'controller/comment_controller.dart' as new_controllers;
+import 'controllers/measureunit_controller.dart' as measureunit_new;
+import 'controllers/ingredient_new.dart' as ingredient_new;
+import 'controllers/freezer_new.dart' as freezer_new;
+import 'controllers/favorite_new.dart' as favorite_new;
+import 'controllers/comment_new.dart' as comment_new;
 
 class FoodapiChannel extends ApplicationChannel {
   late ManagedContext context;
@@ -58,7 +66,7 @@ class FoodapiChannel extends ApplicationChannel {
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
     
     final dbHost = Platform.environment['DATABASE_HOST'] ?? 'localhost';
-    final dbPort = int.parse(Platform.environment['DATABASE_PORT'] ?? '5432');
+    final dbPort = int.parse(Platform.environment['DATABASE_PORT'] ?? '5433');
     final dbUser = Platform.environment['DATABASE_USER'] ?? 'food';
     final dbPassword = Platform.environment['DATABASE_PASSWORD'] ?? 'yaigoo2E';
     final dbName = Platform.environment['DATABASE_NAME'] ?? 'food';
@@ -90,7 +98,9 @@ class FoodapiChannel extends ApplicationChannel {
         return request;
       });
 
+    // Main recipe endpoints (no auth required)
     router.route("/recipe[/:id]").link(() => RecipeController(context));
+    router.route("/recipe/search").link(() => RecipeSearchController(context));
     
     // Recipe Steps
     router.route("/steps[/:id]").link(() => new_controllers.RecipeStepController(context));
@@ -115,22 +125,37 @@ class FoodapiChannel extends ApplicationChannel {
     // Original endpoints (keeping for backward compatibility)
     router
         .route("/recipe_step[/:id]")
-        .link(() => RecipeStepController(context));
+        .link(() => old_recipe.RecipeStepController(context));
     router
         .route("/recipe_step_link[/:id]")
-        .link(() => RecipeStepLinksController(context));
-    router.route("/comment[/:id]").link(() => CommentController(context));
-    router.route("/ingredient[/:id]").link(() => IngredientController(context));
+        .link(() => old_recipe.RecipeStepLinksController(context));
+    router.route("/comment[/:id]").link(() => comment_new.CommentController(context));
+    router.route("/ingredient[/:id]").link(() => ingredient_new.IngredientController(context));
     router
         .route("/recipe_ingredient[/:id]")
-        .link(() => RecipeIngredientController(context));
+        .link(() => old_recipe.RecipeIngredientController(context));
     router
         .route("/measure_unit[/:id]")
-        .link(() => MeasureUnitController(context));
-    router.route("/freezer[/:id]").link(() => FreezerController(context));
-    router.route("/favorite[/:id]").link(() => FavoriteController(context));
+        .link(() => measureunit_new.MeasureUnitController(context));
+    router.route("/freezer[/:id]").link(() => freezer_new.FreezerController(context));
+    router.route("/favorite[/:id]").link(() => favorite_new.FavoriteController(context));
+    
+    // Authentication endpoints (no auth required)
     router.route("/user").link(() => UserController(context));
     router.route("/user/:id").link(() => UserInfoController(context));
+    
+    // User-specific endpoints (authentication required)
+    router.route("/user/profile[/:path]")
+      .link(() => AuthMiddleware(context))!
+      .link(() => UserProfileController(context));
+    
+    router.route("/user/favorites[/:recipeId]")
+      .link(() => AuthMiddleware(context))!
+      .link(() => UserFavoritesController(context));
+    
+    router.route("/user/comments[/:id]")
+      .link(() => AuthMiddleware(context))!
+      .link(() => UserCommentsController(context));
     
     // Test endpoint
     router.route("/test").linkFunction((request) async {
