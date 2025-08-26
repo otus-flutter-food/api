@@ -292,22 +292,376 @@ curl -X DELETE https://foodapi.dzolotov.pro/freezer/1
 curl https://foodapi.dzolotov.pro/comment
 ```
 
+Ответ:
+```json
+[
+  {
+    "id": 1,
+    "text": "Отличный рецепт!",
+    "photo": null,
+    "date_time": "2025-08-25T18:49:19.966104Z",
+    "user": {
+      "id": 1,
+      "login": "test@example.com"
+    },
+    "recipe": {
+      "id": 1,
+      "name": "Блины",
+      "duration": 1800,
+      "photo": "https://example.com/bliny.jpg"
+    }
+  }
+]
+```
+
+**GET /comment/{id}** - Получить комментарий по ID
+```bash
+curl https://foodapi.dzolotov.pro/comment/1
+```
+
+**GET /comment/recipe/{recipeId}** - Получить все комментарии к конкретному рецепту
+```bash
+curl https://foodapi.dzolotov.pro/comment/recipe/1
+```
+
+Ответ:
+```json
+[
+  {
+    "id": 1,
+    "text": "Отличный рецепт! Получились вкусные блины",
+    "photo": null,
+    "date_time": "2025-08-25T18:49:19.966104Z",
+    "user": {
+      "id": 1,
+      "login": "test@example.com"
+    }
+  },
+  {
+    "id": 2,
+    "text": "Добавила ванилин, стало еще вкуснее",
+    "photo": "https://example.com/photo.jpg",
+    "date_time": "2025-08-25T19:15:30.123456Z",
+    "user": {
+      "id": 2,
+      "login": "user@example.com"
+    }
+  }
+]
+```
+
+**GET /comment/user/{userId}** - Получить все комментарии конкретного пользователя
+```bash
+curl https://foodapi.dzolotov.pro/comment/user/1
+```
+
 **POST /comment** - Добавить комментарий (требует правильной структуры JSON)
 ```bash
 curl -X POST https://foodapi.dzolotov.pro/comment \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Отличный рецепт!",
+    "photo": "https://example.com/my-photo.jpg",
     "user": {"id": 1},
     "recipe": {"id": 1}
   }'
 ```
 
+Ответ:
+```json
+{
+  "id": 3,
+  "text": "Отличный рецепт!",
+  "photo": "https://example.com/my-photo.jpg",
+  "date_time": "2025-08-26T10:30:00.000000Z",
+  "user": {"id": 1},
+  "recipe": {"id": 1}
+}
+```
+
+**PUT /comment/{id}** - Обновить комментарий
+```bash
+curl -X PUT https://foodapi.dzolotov.pro/comment/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Обновленный текст комментария",
+    "photo": "https://example.com/new-photo.jpg"
+  }'
+```
+
+**DELETE /comment/{id}** - Удалить комментарий
+```bash
+curl -X DELETE https://foodapi.dzolotov.pro/comment/1
+```
+
+#### Health Check
+
+**GET /healthz** - Проверка состояния сервера (health check)
+```bash
+curl https://foodapi.dzolotov.pro/healthz
+```
+
+Ответ:
+```json
+{
+  "status": "healthy"
+}
+```
+
+Поддерживается также HEAD запрос:
+```bash
+curl -I https://foodapi.dzolotov.pro/healthz
+```
+
+### Связи рецептов с ингредиентами и шагами
+
 #### Ингредиенты рецептов
 
-**GET /recipe-ingredients/recipe/{recipeId}** - Получить ингредиенты рецепта
+**GET /recipe-ingredients** - Получить все связи рецептов с ингредиентами
+```bash
+curl https://foodapi.dzolotov.pro/recipe-ingredients
+```
+
+Ответ:
+```json
+[
+  {
+    "id": 1,
+    "recipe_id": 1,
+    "ingredient_id": 2,
+    "count": 500.0
+  }
+]
+```
+
+**GET /recipe-ingredients/recipe/{recipeId}** - Получить ингредиенты конкретного рецепта
 ```bash
 curl https://foodapi.dzolotov.pro/recipe-ingredients/recipe/1
+```
+
+Ответ:
+```json
+[
+  {
+    "id": 1,
+    "count": 500.0,
+    "ingredient": {
+      "id": 2,
+      "name": "Мука пшеничная",
+      "caloriesForUnit": 3.5,
+      "measureunit": {
+        "id": 1,
+        "one": "грамм",
+        "few": "грамма",
+        "many": "граммов"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "count": 3.0,
+    "ingredient": {
+      "id": 4,
+      "name": "Яйца",
+      "caloriesForUnit": 70.0,
+      "measureunit": {
+        "id": 2,
+        "one": "штука",
+        "few": "штуки",
+        "many": "штук"
+      }
+    }
+  }
+]
+```
+
+**POST /recipe-ingredients** - Добавить ингредиент к рецепту
+```bash
+curl -X POST https://foodapi.dzolotov.pro/recipe-ingredients \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipe_id": 1,
+    "ingredient_id": 5,
+    "count": 200.0
+  }'
+```
+
+**PUT /recipe-ingredients/{id}** - Обновить количество ингредиента в рецепте
+```bash
+curl -X PUT https://foodapi.dzolotov.pro/recipe-ingredients/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "count": 600.0
+  }'
+```
+
+**DELETE /recipe-ingredients/{id}** - Удалить ингредиент из рецепта
+```bash
+curl -X DELETE https://foodapi.dzolotov.pro/recipe-ingredients/1
+```
+
+#### Шаги рецептов
+
+**GET /recipe-step-links** - Получить все связи рецептов с шагами
+```bash
+curl https://foodapi.dzolotov.pro/recipe-step-links
+```
+
+Ответ:
+```json
+[
+  {
+    "id": 1,
+    "recipe_id": 1,
+    "step_id": 1,
+    "number": 1
+  }
+]
+```
+
+**GET /recipe-step-links/{id}** - Получить связь по ID
+```bash
+curl https://foodapi.dzolotov.pro/recipe-step-links/1
+```
+
+**GET /recipe-step-links/recipe/{recipeId}** - Получить шаги конкретного рецепта в правильном порядке
+```bash
+curl https://foodapi.dzolotov.pro/recipe-step-links/recipe/1
+```
+
+Ответ:
+```json
+[
+  {
+    "id": 1,
+    "number": 1,
+    "step": {
+      "id": 1,
+      "name": "Смешать муку с молоком",
+      "duration": 300
+    }
+  },
+  {
+    "id": 2,
+    "number": 2,
+    "step": {
+      "id": 2,
+      "name": "Добавить яйца и соль",
+      "duration": 180
+    }
+  },
+  {
+    "id": 3,
+    "number": 3,
+    "step": {
+      "id": 3,
+      "name": "Жарить на сковороде",
+      "duration": 600
+    }
+  }
+]
+```
+
+**POST /recipe-step-links** - Добавить шаг к рецепту
+```bash
+curl -X POST https://foodapi.dzolotov.pro/recipe-step-links \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipe_id": 1,
+    "step_id": 4,
+    "number": 4
+  }'
+```
+
+**PUT /recipe-step-links/{id}** - Изменить порядок шага в рецепте
+```bash
+curl -X PUT https://foodapi.dzolotov.pro/recipe-step-links/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "number": 2
+  }'
+```
+
+**DELETE /recipe-step-links/{id}** - Удалить шаг из рецепта
+```bash
+curl -X DELETE https://foodapi.dzolotov.pro/recipe-step-links/1
+```
+
+#### Batch операции
+
+**POST /recipe-step-links/batch** - Добавить несколько шагов к рецепту за раз
+```bash
+curl -X POST https://foodapi.dzolotov.pro/recipe-step-links/batch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipe_id": 1,
+    "steps": [
+      {"step_id": 1, "number": 1},
+      {"step_id": 2, "number": 2},
+      {"step_id": 3, "number": 3}
+    ]
+  }'
+```
+
+**PUT /recipe-step-links/reorder** - Переупорядочить шаги рецепта
+```bash
+curl -X PUT https://foodapi.dzolotov.pro/recipe-step-links/reorder \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipe_id": 1,
+    "step_links": [
+      {"id": 3, "number": 1},
+      {"id": 1, "number": 2},
+      {"id": 2, "number": 3}
+    ]
+  }'
+```
+
+**POST /recipe-ingredients/batch** - Добавить несколько ингредиентов к рецепту за раз
+```bash
+curl -X POST https://foodapi.dzolotov.pro/recipe-ingredients/batch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipe_id": 1,
+    "ingredients": [
+      {"ingredient_id": 2, "count": 500.0},
+      {"ingredient_id": 3, "count": 750.0},
+      {"ingredient_id": 4, "count": 3.0}
+    ]
+  }'
+```
+
+#### Полная информация о рецепте
+
+При запросе рецепта по ID возвращается полная информация, включая все связанные данные:
+
+**GET /recipe/{id}** - Получить полную информацию о рецепте
+```bash
+curl https://foodapi.dzolotov.pro/recipe/1
+```
+
+Ответ содержит:
+- Основную информацию о рецепте (название, время приготовления, фото)
+- Список ингредиентов с количеством и единицами измерения
+- Список шагов приготовления в правильном порядке
+- Комментарии пользователей к рецепту
+
+### Пользователи
+
+**GET /user/{id}** - Получить публичную информацию о пользователе
+```bash
+curl https://foodapi.dzolotov.pro/user/1
+```
+
+Ответ:
+```json
+{
+  "id": 1,
+  "login": "test@example.com",
+  "firstName": "Иван",
+  "lastName": "Петров",
+  "avatarUrl": "https://example.com/avatar.jpg"
+}
 ```
 
 ### Авторизация - ПОЛНОСТЬЮ РАБОТАЕТ ✅
