@@ -8,6 +8,17 @@ class HealthController extends ResourceController {
 
   @Operation.get()
   Future<Response> checkHealth() async {
+    return _performHealthCheck();
+  }
+
+  @Operation('HEAD')
+  Future<Response> checkHealthHead() async {
+    final result = await _performHealthCheck();
+    // Для HEAD запроса возвращаем только статус код без тела
+    return Response(result.statusCode, null, {});
+  }
+
+  Future<Response> _performHealthCheck() async {
     try {
       // Проверяем подключение к базе данных простым запросом
       final query = context.persistentStore.execute("SELECT 1 as health_check");
