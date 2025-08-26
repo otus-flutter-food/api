@@ -1,0 +1,7 @@
+# Configuration for API documentation generation
+database:
+  host: localhost
+  port: 5433
+  username: food
+  password: yaigoo2E
+  databaseName: food

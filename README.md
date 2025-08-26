@@ -49,7 +49,7 @@ dart pub run conduit:conduit db upgrade --connect postgres://food:yaigoo2E@local
 dart run bin/main.dart
 ```
 
-Сервер будет доступен по адресу: http://localhost:8888
+Сервер будет доступен по адресу: https://foodapi.dzolotov.pro
 
 ## API Endpoints
 
@@ -67,7 +67,7 @@ dart run bin/main.dart
 
 Пример:
 ```bash
-curl http://localhost:8888/recipes?page=1&limit=10&search=блин
+curl https://foodapi.dzolotov.pro/recipes?page=1&limit=10&search=блин
 ```
 
 Ответ:
@@ -92,12 +92,12 @@ curl http://localhost:8888/recipes?page=1&limit=10&search=блин
 
 **GET /recipes/{id}** - Получить рецепт по ID с полной информацией (включая шаги, ингредиенты, комментарии)
 ```bash
-curl http://localhost:8888/recipes/1
+curl https://foodapi.dzolotov.pro/recipes/1
 ```
 
 **POST /recipes** - Создать новый рецепт
 ```bash
-curl -X POST http://localhost:8888/recipes \
+curl -X POST https://foodapi.dzolotov.pro/recipes \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Новый рецепт",
@@ -108,7 +108,7 @@ curl -X POST http://localhost:8888/recipes \
 
 **PUT /recipes/{id}** - Обновить рецепт
 ```bash
-curl -X PUT http://localhost:8888/recipes/1 \
+curl -X PUT https://foodapi.dzolotov.pro/recipes/1 \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Обновленное название",
@@ -118,24 +118,24 @@ curl -X PUT http://localhost:8888/recipes/1 \
 
 **DELETE /recipes/{id}** - Удалить рецепт (каскадно удаляет связанные данные)
 ```bash
-curl -X DELETE http://localhost:8888/recipes/1
+curl -X DELETE https://foodapi.dzolotov.pro/recipes/1
 ```
 
 #### Шаги рецептов
 
 **GET /steps** - Получить все шаги
 ```bash
-curl http://localhost:8888/steps
+curl https://foodapi.dzolotov.pro/steps
 ```
 
 **GET /steps/{id}** - Получить шаг по ID
 ```bash
-curl http://localhost:8888/steps/1
+curl https://foodapi.dzolotov.pro/steps/1
 ```
 
 **POST /steps** - Создать новый шаг
 ```bash
-curl -X POST http://localhost:8888/steps \
+curl -X POST https://foodapi.dzolotov.pro/steps \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Смешать ингредиенты",
@@ -143,11 +143,56 @@ curl -X POST http://localhost:8888/steps \
   }'
 ```
 
+#### Ингредиенты
+
+**GET /ingredient** - Получить список ингредиентов
+```bash
+curl https://foodapi.dzolotov.pro/ingredient
+```
+
+**GET /ingredient/{id}** - Получить ингредиент по ID
+```bash
+curl https://foodapi.dzolotov.pro/ingredient/3
+```
+
+**POST /ingredient** - Создать новый ингредиент
+```bash
+curl -X POST https://foodapi.dzolotov.pro/ingredient \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Мёд",
+    "caloriesForUnit": 3.04,
+    "measureunit": {"id": 1}
+  }'
+```
+
+**PUT /ingredient/{id}** - Обновить ингредиент
+```bash
+curl -X PUT https://foodapi.dzolotov.pro/ingredient/12 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Мёд липовый",
+    "caloriesForUnit": 3.1
+  }'
+```
+
+**DELETE /ingredient/{id}** - Удалить ингредиент
+```bash
+curl -X DELETE https://foodapi.dzolotov.pro/ingredient/12
+```
+
+#### Единицы измерения
+
+**GET /measure_unit** - Получить единицы измерения
+```bash
+curl https://foodapi.dzolotov.pro/measure_unit
+```
+
 #### Ингредиенты рецептов
 
 **GET /recipe-ingredients/recipe/{recipeId}** - Получить ингредиенты рецепта
 ```bash
-curl http://localhost:8888/recipe-ingredients/recipe/1
+curl https://foodapi.dzolotov.pro/recipe-ingredients/recipe/1
 ```
 
 ### Авторизация - ПОЛНОСТЬЮ РАБОТАЕТ ✅
@@ -155,7 +200,7 @@ curl http://localhost:8888/recipe-ingredients/recipe/1
 **POST /user** - Регистрация нового пользователя
 ```bash
 # Минимальная регистрация
-curl -X POST http://localhost:8888/user \
+curl -X POST https://foodapi.dzolotov.pro/user \
   -H "Content-Type: application/json" \
   -d '{
     "login": "user@example.com",
@@ -163,15 +208,15 @@ curl -X POST http://localhost:8888/user \
   }'
 
 # Регистрация с полным профилем
-curl -X POST http://localhost:8888/user \
+curl -X POST https://foodapi.dzolotov.pro/user \
   -H "Content-Type: application/json" \
   -d '{
     "login": "user@example.com",
     "password": "password123",
-    "first_name": "Иван",
-    "last_name": "Петров",
+    "firstName": "Иван",
+    "lastName": "Петров",
     "phone": "+79001234567",
-    "avatar_url": "https://example.com/avatar.jpg",
+    "avatarUrl": "https://example.com/avatar.jpg",
     "birthday": "1990-01-15T00:00:00.000Z"
   }'
 ```
@@ -185,7 +230,7 @@ curl -X POST http://localhost:8888/user \
 
 **PUT /user** - Вход в систему (получение токена)
 ```bash
-curl -X PUT http://localhost:8888/user \
+curl -X PUT https://foodapi.dzolotov.pro/user \
   -H "Content-Type: application/json" \
   -d '{
     "login": "user@example.com",
@@ -211,7 +256,7 @@ Authorization: Bearer {token}
 
 **GET /user/profile** - Получить профиль текущего пользователя
 ```bash
-curl http://localhost:8888/user/profile \
+curl https://foodapi.dzolotov.pro/user/profile \
   -H "Authorization: Bearer 12451f51-2b3d-4e5b-9cf2-5bfdb44fdc7a"
 ```
 
@@ -220,31 +265,31 @@ curl http://localhost:8888/user/profile \
 {
   "id": 1,
   "login": "test@example.com",
-  "first_name": "Иван",
-  "last_name": "Петров",
+  "firstName": "Иван",
+  "lastName": "Петров",
   "phone": "+79001234567",
-  "avatar_url": "https://example.com/avatar.jpg",
+  "avatarUrl": "https://example.com/avatar.jpg",
   "birthday": "1990-01-15T00:00:00.000Z"
 }
 ```
 
 **PUT /user/profile** - Обновить профиль
 ```bash
-curl -X PUT http://localhost:8888/user/profile \
+curl -X PUT https://foodapi.dzolotov.pro/user/profile \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
-    "first_name": "Иван",
-    "last_name": "Петров",
+    "firstName": "Иван",
+    "lastName": "Петров",
     "phone": "+79001234567",
-    "avatar_url": "https://example.com/avatar.jpg",
+    "avatarUrl": "https://example.com/avatar.jpg",
     "birthday": "1990-01-15T00:00:00.000Z"
   }'
 ```
 
 **POST /user/profile/logout** - Выход из системы
 ```bash
-curl -X POST http://localhost:8888/user/profile/logout \
+curl -X POST https://foodapi.dzolotov.pro/user/profile/logout \
   -H "Authorization: Bearer {token}"
 ```
 
@@ -252,7 +297,7 @@ curl -X POST http://localhost:8888/user/profile/logout \
 
 **GET /user/favorites** - Получить список избранных рецептов
 ```bash
-curl http://localhost:8888/user/favorites \
+curl https://foodapi.dzolotov.pro/user/favorites \
   -H "Authorization: Bearer {token}"
 ```
 
@@ -270,7 +315,7 @@ curl http://localhost:8888/user/favorites \
 
 **POST /user/favorites/{recipeId}** - Добавить рецепт в избранное
 ```bash
-curl -X POST http://localhost:8888/user/favorites/1 \
+curl -X POST https://foodapi.dzolotov.pro/user/favorites/1 \
   -H "Authorization: Bearer {token}"
 ```
 
@@ -288,7 +333,7 @@ curl -X POST http://localhost:8888/user/favorites/1 \
 
 **DELETE /user/favorites/{recipeId}** - Удалить рецепт из избранного
 ```bash
-curl -X DELETE http://localhost:8888/user/favorites/1 \
+curl -X DELETE https://foodapi.dzolotov.pro/user/favorites/1 \
   -H "Authorization: Bearer {token}"
 ```
 
@@ -296,13 +341,13 @@ curl -X DELETE http://localhost:8888/user/favorites/1 \
 
 **GET /user/comments** - Получить комментарии пользователя
 ```bash
-curl http://localhost:8888/user/comments \
+curl https://foodapi.dzolotov.pro/user/comments \
   -H "Authorization: Bearer {token}"
 ```
 
 **POST /user/comments** - Добавить комментарий к рецепту
 ```bash
-curl -X POST http://localhost:8888/user/comments \
+curl -X POST https://foodapi.dzolotov.pro/user/comments \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -330,7 +375,7 @@ curl -X POST http://localhost:8888/user/comments \
 
 **DELETE /user/comments/{id}** - Удалить комментарий
 ```bash
-curl -X DELETE http://localhost:8888/user/comments/1 \
+curl -X DELETE https://foodapi.dzolotov.pro/user/comments/1 \
   -H "Authorization: Bearer {token}"
 ```
 
@@ -426,6 +471,7 @@ lib/
 5. **Пагинация** - поддержка пагинации для списковых endpoints
 6. **Фильтрация и поиск** - возможность фильтровать рецепты по различным критериям
 7. **Каскадное удаление** - правильная обработка связанных данных при удалении
+8. **Поддержка Flutter** - автоматическая конвертация camelCase/snake_case для совместимости
 
 ## Тестовые данные
 
@@ -511,16 +557,16 @@ services:
 ### Быстрый тест:
 ```bash
 # Регистрация
-curl -X POST http://localhost:8888/user \
+curl -X POST https://foodapi.dzolotov.pro/user \
   -H "Content-Type: application/json" \
   -d '{"login": "test@test.com", "password": "test123"}'
 
 # Вход
-TOKEN=$(curl -X PUT http://localhost:8888/user \
+TOKEN=$(curl -X PUT https://foodapi.dzolotov.pro/user \
   -H "Content-Type: application/json" \
   -d '{"login": "test@test.com", "password": "test123"}' | jq -r .token)
 
 # Проверка авторизации
-curl http://localhost:8888/user/profile \
+curl https://foodapi.dzolotov.pro/user/profile \
   -H "Authorization: Bearer $TOKEN"
 ```

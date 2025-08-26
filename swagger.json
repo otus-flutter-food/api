@@ -1,1 +1,580 @@
-{"openapi":"3.0.0","info":{"title":"foodapi","description":"Food API","version":"0.1.0"},"servers":[{"url":"http://localhost:8888"}],"paths":{"/recipe":{"post":{"tags":["Recipe"],"operationId":"createRecipe","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Recipe"}}}},"responses":{"200":{"description":"Returns created object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Recipe"}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}},"get":{"tags":["Recipe"],"operationId":"getRecipes","parameters":[{"name":"count","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"offset","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"pageBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pageAfter","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pagePrior","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"sortBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"Returns a list of objects.","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Recipe"}}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/recipe/{id}":{"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"explode":false,"allowReserved":false}],"get":{"tags":["Recipe"],"operationId":"getRecipe","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Returns a single object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Recipe"}}}},"404":{"description":"No object found."}}},"delete":{"tags":["Recipe"],"operationId":"deleteRecipe","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Object successfully deleted."},"404":{"description":"No object found."}}},"put":{"tags":["Recipe"],"operationId":"updateRecipe","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Recipe"}}}},"responses":{"200":{"description":"Returns updated object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Recipe"}}}},"404":{"description":"No object found."},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/recipe_step":{"post":{"tags":["RecipeStep"],"operationId":"createRecipeStep","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeStep"}}}},"responses":{"200":{"description":"Returns created object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeStep"}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}},"get":{"tags":["RecipeStep"],"operationId":"getRecipeSteps","parameters":[{"name":"count","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"offset","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"pageBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pageAfter","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pagePrior","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"sortBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"Returns a list of objects.","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/RecipeStep"}}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/recipe_step/{id}":{"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"explode":false,"allowReserved":false}],"get":{"tags":["RecipeStep"],"operationId":"getRecipeStep","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Returns a single object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeStep"}}}},"404":{"description":"No object found."}}},"delete":{"tags":["RecipeStep"],"operationId":"deleteRecipeStep","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Object successfully deleted."},"404":{"description":"No object found."}}},"put":{"tags":["RecipeStep"],"operationId":"updateRecipeStep","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeStep"}}}},"responses":{"200":{"description":"Returns updated object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeStep"}}}},"404":{"description":"No object found."},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/recipe_step_link":{"post":{"tags":["RecipeStepLinks"],"operationId":"createRecipeStepLink","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeStepLink"}}}},"responses":{"200":{"description":"Returns created object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeStepLink"}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}},"get":{"tags":["RecipeStepLinks"],"operationId":"getRecipeStepLinks","parameters":[{"name":"count","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"offset","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"pageBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pageAfter","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pagePrior","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"sortBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"Returns a list of objects.","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/RecipeStepLink"}}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/recipe_step_link/{id}":{"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"explode":false,"allowReserved":false}],"get":{"tags":["RecipeStepLinks"],"operationId":"getRecipeStepLink","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Returns a single object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeStepLink"}}}},"404":{"description":"No object found."}}},"delete":{"tags":["RecipeStepLinks"],"operationId":"deleteRecipeStepLink","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Object successfully deleted."},"404":{"description":"No object found."}}},"put":{"tags":["RecipeStepLinks"],"operationId":"updateRecipeStepLink","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeStepLink"}}}},"responses":{"200":{"description":"Returns updated object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeStepLink"}}}},"404":{"description":"No object found."},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/comment":{"post":{"tags":["Comment"],"operationId":"createComment","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Comment"}}}},"responses":{"200":{"description":"Returns created object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Comment"}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}},"get":{"tags":["Comment"],"operationId":"getComments","parameters":[{"name":"count","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"offset","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"pageBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pageAfter","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pagePrior","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"sortBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"Returns a list of objects.","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Comment"}}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/comment/{id}":{"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"explode":false,"allowReserved":false}],"get":{"tags":["Comment"],"operationId":"getComment","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Returns a single object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Comment"}}}},"404":{"description":"No object found."}}},"delete":{"tags":["Comment"],"operationId":"deleteComment","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Object successfully deleted."},"404":{"description":"No object found."}}},"put":{"tags":["Comment"],"operationId":"updateComment","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Comment"}}}},"responses":{"200":{"description":"Returns updated object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Comment"}}}},"404":{"description":"No object found."},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/ingredient":{"post":{"tags":["Ingredient"],"operationId":"createIngredient","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Ingredient"}}}},"responses":{"200":{"description":"Returns created object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Ingredient"}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}},"get":{"tags":["Ingredient"],"operationId":"getIngredients","parameters":[{"name":"count","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"offset","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"pageBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pageAfter","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pagePrior","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"sortBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"Returns a list of objects.","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Ingredient"}}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/ingredient/{id}":{"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"explode":false,"allowReserved":false}],"get":{"tags":["Ingredient"],"operationId":"getIngredient","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Returns a single object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Ingredient"}}}},"404":{"description":"No object found."}}},"delete":{"tags":["Ingredient"],"operationId":"deleteIngredient","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Object successfully deleted."},"404":{"description":"No object found."}}},"put":{"tags":["Ingredient"],"operationId":"updateIngredient","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Ingredient"}}}},"responses":{"200":{"description":"Returns updated object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Ingredient"}}}},"404":{"description":"No object found."},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/recipe_ingredient":{"post":{"tags":["RecipeIngredient"],"operationId":"createRecipeIngredient","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeIngredient"}}}},"responses":{"200":{"description":"Returns created object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeIngredient"}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}},"get":{"tags":["RecipeIngredient"],"operationId":"getRecipeIngredients","parameters":[{"name":"count","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"offset","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"pageBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pageAfter","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pagePrior","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"sortBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"Returns a list of objects.","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/RecipeIngredient"}}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/recipe_ingredient/{id}":{"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"explode":false,"allowReserved":false}],"get":{"tags":["RecipeIngredient"],"operationId":"getRecipeIngredient","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Returns a single object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeIngredient"}}}},"404":{"description":"No object found."}}},"delete":{"tags":["RecipeIngredient"],"operationId":"deleteRecipeIngredient","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Object successfully deleted."},"404":{"description":"No object found."}}},"put":{"tags":["RecipeIngredient"],"operationId":"updateRecipeIngredient","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeIngredient"}}}},"responses":{"200":{"description":"Returns updated object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RecipeIngredient"}}}},"404":{"description":"No object found."},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/measure_unit":{"post":{"tags":["MeasureUnit"],"operationId":"createMeasureUnit","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/MeasureUnit"}}}},"responses":{"200":{"description":"Returns created object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/MeasureUnit"}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}},"get":{"tags":["MeasureUnit"],"operationId":"getMeasureUnits","parameters":[{"name":"count","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"offset","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"pageBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pageAfter","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pagePrior","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"sortBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"Returns a list of objects.","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/MeasureUnit"}}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/measure_unit/{id}":{"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"explode":false,"allowReserved":false}],"get":{"tags":["MeasureUnit"],"operationId":"getMeasureUnit","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Returns a single object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/MeasureUnit"}}}},"404":{"description":"No object found."}}},"delete":{"tags":["MeasureUnit"],"operationId":"deleteMeasureUnit","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Object successfully deleted."},"404":{"description":"No object found."}}},"put":{"tags":["MeasureUnit"],"operationId":"updateMeasureUnit","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/MeasureUnit"}}}},"responses":{"200":{"description":"Returns updated object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/MeasureUnit"}}}},"404":{"description":"No object found."},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/freezer":{"post":{"tags":["Freezer"],"operationId":"createFreezer","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Freezer"}}}},"responses":{"200":{"description":"Returns created object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Freezer"}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}},"get":{"tags":["Freezer"],"operationId":"getFreezers","parameters":[{"name":"count","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"offset","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"pageBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pageAfter","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pagePrior","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"sortBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"Returns a list of objects.","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Freezer"}}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/freezer/{id}":{"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"explode":false,"allowReserved":false}],"get":{"tags":["Freezer"],"operationId":"getFreezer","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Returns a single object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Freezer"}}}},"404":{"description":"No object found."}}},"delete":{"tags":["Freezer"],"operationId":"deleteFreezer","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Object successfully deleted."},"404":{"description":"No object found."}}},"put":{"tags":["Freezer"],"operationId":"updateFreezer","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Freezer"}}}},"responses":{"200":{"description":"Returns updated object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Freezer"}}}},"404":{"description":"No object found."},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/favorite":{"post":{"tags":["Favorite"],"operationId":"createFavorite","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Favorite"}}}},"responses":{"200":{"description":"Returns created object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Favorite"}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}},"get":{"tags":["Favorite"],"operationId":"getFavorites","parameters":[{"name":"count","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"offset","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"integer"}},{"name":"pageBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pageAfter","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"pagePrior","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"string"}},{"name":"sortBy","in":"query","required":false,"allowEmptyValue":false,"schema":{"type":"array","items":{"type":"string"}}}],"responses":{"200":{"description":"Returns a list of objects.","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Favorite"}}}}},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/favorite/{id}":{"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"explode":false,"allowReserved":false}],"get":{"tags":["Favorite"],"operationId":"getFavorite","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Returns a single object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Favorite"}}}},"404":{"description":"No object found."}}},"delete":{"tags":["Favorite"],"operationId":"deleteFavorite","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Object successfully deleted."},"404":{"description":"No object found."}}},"put":{"tags":["Favorite"],"operationId":"updateFavorite","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Favorite"}}}},"responses":{"200":{"description":"Returns updated object.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Favorite"}}}},"404":{"description":"No object found."},"400":{"description":"Invalid request.","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}},"409":{"description":"Object already exists","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}},"/user":{"post":{"tags":["User"],"operationId":"register","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/User"}}}},"responses":{"200":{"description":"User is created","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Status"}}}},"409":{"description":"User is already exists","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}}}},"put":{"tags":["User"],"operationId":"auth","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/User"}}}},"responses":{"200":{"description":"User is logged in","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Token"}}}},"403":{"description":"User credentials are invalid","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}}}}},"/user/{id}":{"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"},"explode":false,"allowReserved":false}],"get":{"tags":["UserInfo"],"operationId":"getUser","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"Successful response."}}}}},"components":{"schemas":{"Freezer":{"title":"Freezer","type":"object","properties":{"id":{"title":"id","type":"integer","description":"This is the primary identifier for this object.\n","nullable":false},"count":{"title":"count","type":"number","nullable":false},"user":{"title":"user","type":"object","properties":{"id":{"type":"integer"}}},"ingredient":{"title":"ingredient","type":"object","properties":{"id":{"type":"integer"}}}},"description":""},"User":{"title":"User","type":"object","properties":{"id":{"title":"id","type":"integer","description":"This is the primary identifier for this object.\n","nullable":false},"login":{"title":"login","type":"string","nullable":false},"password":{"title":"password","type":"string","nullable":false},"token":{"title":"token","type":"string","nullable":false},"avatar":{"title":"avatar","type":"string","nullable":false},"userFreezer":{"type":"array","items":{"$ref":"#/components/schemas/Freezer"},"nullable":true,"readOnly":true},"favoriteRecipes":{"type":"array","items":{"$ref":"#/components/schemas/Favorite"},"nullable":true,"readOnly":true},"comments":{"type":"array","items":{"$ref":"#/components/schemas/Comment"},"nullable":true,"readOnly":true}},"description":""},"Comment":{"title":"Comment","type":"object","properties":{"id":{"title":"id","type":"integer","description":"This is the primary identifier for this object.\n","nullable":false},"text":{"title":"text","type":"string","nullable":false},"photo":{"title":"photo","type":"string","nullable":false},"datetime":{"title":"datetime","type":"string","format":"date-time","nullable":false},"user":{"title":"user","type":"object","properties":{"id":{"type":"integer"}}},"recipe":{"title":"recipe","type":"object","properties":{"id":{"type":"integer"}}}},"description":""},"Favorite":{"title":"Favorite","type":"object","properties":{"id":{"title":"id","type":"integer","description":"This is the primary identifier for this object.\n","nullable":false},"recipe":{"title":"recipe","type":"object","properties":{"id":{"type":"integer"}}},"user":{"title":"user","type":"object","properties":{"id":{"type":"integer"}}}},"description":""},"MeasureUnit":{"title":"MeasureUnit","type":"object","properties":{"id":{"title":"id","type":"integer","description":"This is the primary identifier for this object.\n","nullable":false},"one":{"title":"one","type":"string","nullable":false},"few":{"title":"few","type":"string","nullable":false},"many":{"title":"many","type":"string","nullable":false},"ingredients":{"type":"array","items":{"$ref":"#/components/schemas/Ingredient"},"nullable":true,"readOnly":true}},"description":""},"RecipeIngredient":{"title":"RecipeIngredient","type":"object","properties":{"id":{"title":"id","type":"integer","description":"This is the primary identifier for this object.\n","nullable":false},"count":{"title":"count","type":"integer","nullable":false},"ingredient":{"title":"ingredient","type":"object","properties":{"id":{"type":"integer"}}},"recipe":{"title":"recipe","type":"object","properties":{"id":{"type":"integer"}}}},"description":""},"Ingredient":{"title":"Ingredient","type":"object","properties":{"id":{"title":"id","type":"integer","description":"This is the primary identifier for this object.\n","nullable":false},"name":{"title":"name","type":"string","nullable":false},"caloriesForUnit":{"title":"caloriesForUnit","type":"number","nullable":false},"measureUnit":{"title":"measureUnit","type":"object","properties":{"id":{"type":"integer"}}},"recipeIngredients":{"type":"array","items":{"$ref":"#/components/schemas/RecipeIngredient"},"nullable":true,"readOnly":true},"ingredientFreezer":{"type":"array","items":{"$ref":"#/components/schemas/Freezer"},"nullable":true,"readOnly":true}},"description":""},"Recipe":{"title":"Recipe","type":"object","properties":{"id":{"title":"id","type":"integer","description":"This is the primary identifier for this object.\n","nullable":false},"name":{"title":"name","type":"string","nullable":false},"duration":{"title":"duration","type":"integer","nullable":false},"photo":{"title":"photo","type":"string","nullable":false},"recipeIngredients":{"type":"array","items":{"$ref":"#/components/schemas/RecipeIngredient"},"nullable":true,"readOnly":true},"recipeStepLinks":{"type":"array","items":{"$ref":"#/components/schemas/RecipeStepLink"},"nullable":true,"readOnly":true},"favoriteRecipes":{"type":"array","items":{"$ref":"#/components/schemas/Favorite"},"nullable":true,"readOnly":true},"comments":{"type":"array","items":{"$ref":"#/components/schemas/Comment"},"nullable":true,"readOnly":true}},"description":""},"RecipeStepLink":{"title":"RecipeStepLink","type":"object","properties":{"id":{"title":"id","type":"integer","description":"This is the primary identifier for this object.\n","nullable":false},"number":{"title":"number","type":"integer","nullable":false},"recipe":{"title":"recipe","type":"object","properties":{"id":{"type":"integer"}}},"step":{"title":"step","type":"object","properties":{"id":{"type":"integer"}}}},"description":""},"RecipeStep":{"title":"RecipeStep","type":"object","properties":{"id":{"title":"id","type":"integer","description":"This is the primary identifier for this object.\n","nullable":false},"name":{"title":"name","type":"string","nullable":false},"duration":{"title":"duration","type":"integer","nullable":false},"recipeStepLinks":{"type":"array","items":{"$ref":"#/components/schemas/RecipeStepLink"},"nullable":true,"readOnly":true}},"description":""},"Status":{"type":"object","properties":{"status":{"type":"string"}}},"Error":{"type":"object","properties":{"error":{"type":"string"}}},"Token":{"type":"object","properties":{"token":{"type":"string"}}}}}}
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Food Recipe API",
+    "description": "REST API 4;O ?@8;>65=8O @5F5?B>2",
+    "version": "1.0.0",
+    "contact": {
+      "name": "OTUS Flutter Course",
+      "email": "support@example.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8888",
+      "description": "Local development server"
+    },
+    {
+      "url": "http://192.162.246.40:8888",
+      "description": "Production server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "UUID"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "login": {"type": "string"},
+          "password": {"type": "string", "writeOnly": true},
+          "first_name": {"type": "string"},
+          "last_name": {"type": "string"},
+          "phone": {"type": "string"},
+          "avatar_url": {"type": "string"},
+          "birthday": {"type": "string", "format": "date-time"},
+          "token": {"type": "string", "readOnly": true}
+        }
+      },
+      "Recipe": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"},
+          "duration": {"type": "integer", "description": "Duration in seconds"},
+          "photo": {"type": "string"}
+        },
+        "required": ["name", "duration", "photo"]
+      },
+      "Ingredient": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"},
+          "calories_for_unit": {"type": "number"},
+          "measureunit": {"$ref": "#/components/schemas/MeasureUnit"}
+        }
+      },
+      "MeasureUnit": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"}
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "text": {"type": "string"},
+          "dateTime": {"type": "string", "format": "date-time"},
+          "user": {"$ref": "#/components/schemas/User"},
+          "recipe": {"$ref": "#/components/schemas/Recipe"}
+        }
+      },
+      "Favorite": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "user": {"$ref": "#/components/schemas/User"},
+          "recipe": {"$ref": "#/components/schemas/Recipe"}
+        }
+      },
+      "Freezer": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "user": {"$ref": "#/components/schemas/User"},
+          "ingredient": {"$ref": "#/components/schemas/Ingredient"},
+          "count": {"type": "number"}
+        }
+      }
+    }
+  },
+  "paths": {
+    "/user": {
+      "post": {
+        "summary": " 538AB@0F8O =>2>3> ?>;L7>20B5;O",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/User"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful registration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"status": {"type": "string"}}
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "2B>@870F8O ?>;L7>20B5;O",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "login": {"type": "string"},
+                  "password": {"type": "string"}
+                },
+                "required": ["login", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"token": {"type": "string"}}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/profile": {
+      "get": {
+        "summary": ">;CG8BL ?@>D8;L ?>;L7>20B5;O",
+        "tags": ["User Profile"],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/User"}
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "1=>28BL ?@>D8;L ?>;L7>20B5;O",
+        "tags": ["User Profile"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "first_name": {"type": "string"},
+                  "last_name": {"type": "string"},
+                  "phone": {"type": "string"},
+                  "avatar_url": {"type": "string"},
+                  "birthday": {"type": "string", "format": "date-time"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated profile"
+          }
+        }
+      }
+    },
+    "/recipe": {
+      "get": {
+        "summary": ">;CG8BL A?8A>: @5F5?B>2",
+        "tags": ["Recipes"],
+        "parameters": [
+          {"name": "page", "in": "query", "schema": {"type": "integer", "default": 1}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer", "default": 10}}
+        ],
+        "responses": {
+          "200": {
+            "description": "List of recipes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {"$ref": "#/components/schemas/Recipe"}
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "!>740BL =>2K9 @5F5?B",
+        "tags": ["Recipes"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Recipe"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created recipe"
+          }
+        }
+      }
+    },
+    "/recipe/{id}": {
+      "get": {
+        "summary": ">;CG8BL @5F5?B ?> ID",
+        "tags": ["Recipes"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Recipe details"
+          }
+        }
+      },
+      "put": {
+        "summary": "1=>28BL @5F5?B",
+        "tags": ["Recipes"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Recipe"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated recipe"
+          }
+        }
+      },
+      "delete": {
+        "summary": "#40;8BL @5F5?B",
+        "tags": ["Recipes"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Recipe deleted"
+          }
+        }
+      }
+    },
+    "/recipe/search": {
+      "get": {
+        "summary": ">8A: @5F5?B>2",
+        "tags": ["Recipes"],
+        "parameters": [
+          {"name": "query", "in": "query", "required": true, "schema": {"type": "string"}},
+          {"name": "page", "in": "query", "schema": {"type": "integer", "default": 1}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer", "default": 10}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results"
+          }
+        }
+      }
+    },
+    "/ingredient": {
+      "get": {
+        "summary": ">;CG8BL A?8A>: 8=3@5485=B>2",
+        "tags": ["Ingredients"],
+        "responses": {
+          "200": {
+            "description": "List of ingredients"
+          }
+        }
+      },
+      "post": {
+        "summary": "!>740BL =>2K9 8=3@5485=B",
+        "tags": ["Ingredients"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Ingredient"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created ingredient"
+          }
+        }
+      }
+    },
+    "/ingredient/{id}": {
+      "get": {
+        "summary": ">;CG8BL 8=3@5485=B ?> ID",
+        "tags": ["Ingredients"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Ingredient details"
+          }
+        }
+      },
+      "put": {
+        "summary": "1=>28BL 8=3@5485=B",
+        "tags": ["Ingredients"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Ingredient"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated ingredient"
+          }
+        }
+      },
+      "delete": {
+        "summary": "#40;8BL 8=3@5485=B",
+        "tags": ["Ingredients"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Ingredient deleted"
+          },
+          "409": {
+            "description": "Cannot delete ingredient used in recipes"
+          }
+        }
+      }
+    },
+    "/measure_unit": {
+      "get": {
+        "summary": ">;CG8BL A?8A>: 548=8F 87<5@5=8O",
+        "tags": ["Measure Units"],
+        "responses": {
+          "200": {
+            "description": "List of measure units"
+          }
+        }
+      },
+      "post": {
+        "summary": "!>740BL =>2CN 548=8FC 87<5@5=8O",
+        "tags": ["Measure Units"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/MeasureUnit"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created measure unit"
+          }
+        }
+      }
+    },
+    "/comment": {
+      "get": {
+        "summary": ">;CG8BL A?8A>: :><<5=B0@852",
+        "tags": ["Comments"],
+        "parameters": [
+          {"name": "recipeId", "in": "query", "schema": {"type": "integer"}},
+          {"name": "userId", "in": "query", "schema": {"type": "integer"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "List of comments"
+          }
+        }
+      },
+      "post": {
+        "summary": "!>740BL =>2K9 :><<5=B0@89",
+        "tags": ["Comments"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Comment"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created comment"
+          }
+        }
+      }
+    },
+    "/favorite": {
+      "get": {
+        "summary": ">;CG8BL A?8A>: 871@0==>3>",
+        "tags": ["Favorites"],
+        "responses": {
+          "200": {
+            "description": "List of favorites"
+          }
+        }
+      },
+      "post": {
+        "summary": ">1028BL 2 871@0==>5",
+        "tags": ["Favorites"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Favorite"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Added to favorites"
+          },
+          "409": {
+            "description": "Recipe already in favorites"
+          }
+        }
+      }
+    },
+    "/freezer": {
+      "get": {
+        "summary": ">;CG8BL A>45@68<>5 <>@>78;L=8:0",
+        "tags": ["Freezer"],
+        "responses": {
+          "200": {
+            "description": "Freezer contents"
+          }
+        }
+      },
+      "post": {
+        "summary": ">1028BL ?@>4C:B 2 <>@>78;L=8:",
+        "tags": ["Freezer"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Freezer"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Added to freezer"
+          }
+        }
+      }
+    },
+    "/user/favorites": {
+      "get": {
+        "summary": ">;CG8BL 871@0==K5 @5F5?BK ?>;L7>20B5;O",
+        "tags": ["User"],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "User's favorite recipes"
+          }
+        }
+      }
+    },
+    "/user/favorites/{recipeId}": {
+      "post": {
+        "summary": ">1028BL @5F5?B 2 871@0==>5",
+        "tags": ["User"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"name": "recipeId", "in": "path", "required": true, "schema": {"type": "integer"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Recipe added to favorites"
+          }
+        }
+      },
+      "delete": {
+        "summary": "#40;8BL @5F5?B 87 871@0==>3>",
+        "tags": ["User"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"name": "recipeId", "in": "path", "required": true, "schema": {"type": "integer"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Recipe removed from favorites"
+          }
+        }
+      }
+    },
+    "/user/comments": {
+      "get": {
+        "summary": ">;CG8BL :><<5=B0@88 ?>;L7>20B5;O",
+        "tags": ["User"],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "User's comments"
+          }
+        }
+      },
+      "post": {
+        "summary": "!>740BL :><<5=B0@89",
+        "tags": ["User"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "recipeId": {"type": "integer"},
+                  "text": {"type": "string"}
+                },
+                "required": ["recipeId", "text"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comment created"
+          }
+        }
+      }
+    }
+  }
+}

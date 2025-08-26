@@ -59,7 +59,7 @@ class MeasureUnitController extends ResourceController {
   Future<Response> deleteUnit(@Bind.path('id') int id) async {
     // Check if used by any ingredients
     final checkQuery = Query<Ingredient>(context)
-      ..where((i) => i.measureUnit!.id).equalTo(id);
+      ..where((i) => i.measureunit!.id).equalTo(id);
     
     final usedCount = await checkQuery.reduce.count();
     

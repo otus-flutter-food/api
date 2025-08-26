@@ -33,8 +33,8 @@ class _Ingredient {
   @Column(name: "calories_for_unit")
   double? caloriesForUnit;
 
-  @Relate(#ingredients)
-  MeasureUnit? measureUnit;
+  @Relate(#ingredients, onDelete: DeleteRule.nullify)
+  MeasureUnit? measureunit;
 
   ManagedSet<RecipeIngredient>? recipeIngredients;
 

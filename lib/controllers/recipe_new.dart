@@ -82,7 +82,7 @@ class RecipeController extends ResourceController {
         .join(object: (rsl) => rsl.step)
       ..join(set: (r) => r.recipeIngredients)
         .join(object: (ri) => ri.ingredient)
-          .join(object: (i) => i.measureUnit)
+          .join(object: (i) => i.measureunit)
       ..join(set: (r) => r.comments);
     
     final recipe = await query.fetchOne();

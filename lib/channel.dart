@@ -5,14 +5,9 @@ import 'package:conduit_common/conduit_common.dart';
 import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_open_api/v3.dart';
 import 'package:conduit_postgresql/conduit_postgresql.dart';
-import 'package:foodapi/controllers/freezer.dart';
 import 'package:foodapi/controllers/user.dart';
 import 'package:foodapi/foodapi.dart';
 
-import 'controllers/comment.dart';
-import 'controllers/favorite.dart';
-import 'controllers/ingredient.dart';
-import 'controllers/recipe.dart' as old_recipe;
 import 'controllers/recipe_new.dart';
 import 'controllers/user_profile_controller.dart';
 import 'middleware/auth_middleware.dart';
@@ -122,21 +117,10 @@ class FoodapiChannel extends ApplicationChannel {
     router.route("/comments/recipe/:recipeId").link(() => new_controllers.CommentController(context));
     router.route("/comments/user/:userId").link(() => new_controllers.CommentController(context));
     
-    // Original endpoints (keeping for backward compatibility)
-    router
-        .route("/recipe_step[/:id]")
-        .link(() => old_recipe.RecipeStepController(context));
-    router
-        .route("/recipe_step_link[/:id]")
-        .link(() => old_recipe.RecipeStepLinksController(context));
-    router.route("/comment[/:id]").link(() => comment_new.CommentController(context));
+    // Core API endpoints
     router.route("/ingredient[/:id]").link(() => ingredient_new.IngredientController(context));
-    router
-        .route("/recipe_ingredient[/:id]")
-        .link(() => old_recipe.RecipeIngredientController(context));
-    router
-        .route("/measure_unit[/:id]")
-        .link(() => measureunit_new.MeasureUnitController(context));
+    router.route("/measure_unit[/:id]").link(() => measureunit_new.MeasureUnitController(context));
+    router.route("/comment[/:id]").link(() => comment_new.CommentController(context));
     router.route("/freezer[/:id]").link(() => freezer_new.FreezerController(context));
     router.route("/favorite[/:id]").link(() => favorite_new.FavoriteController(context));
     
