@@ -1,4 +1,5 @@
 import 'package:conduit_core/conduit_core.dart';
+import 'package:conduit_open_api/src/v3/response.dart';
 import '../model/freezer.dart';
 import '../model/user.dart';
 import '../model/ingredient.dart';
@@ -7,6 +8,36 @@ class FreezerController extends ResourceController {
   FreezerController(this.context);
   
   final ManagedContext context;
+  
+  @override
+  Map<String, APIResponse> documentOperationResponses(
+    context, 
+    Operation operation
+  ) {
+    if (operation.method == "GET") {
+      return {
+        "200": APIResponse.schema("Список продуктов в морозилке", context.schema['Freezer']),
+        "404": APIResponse("Продукт не найден в морозилке")
+      };
+    } else if (operation.method == "POST") {
+      return {
+        "200": APIResponse.schema("Продукт добавлен в морозилку", context.schema['Freezer']),
+        "400": APIResponse("Ошибка валидации (неверный user ID или ingredient ID)")
+      };
+    } else if (operation.method == "PUT") {
+      return {
+        "200": APIResponse.schema("Продукт в морозилке обновлён", context.schema['Freezer']),
+        "404": APIResponse("Продукт не найден в морозилке"),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "DELETE") {
+      return {
+        "200": APIResponse("Продукт удалён из морозилки"),
+        "404": APIResponse("Продукт не найден в морозилке")
+      };
+    }
+    return {};
+  }
   
   @Operation.get()
   Future<Response> getAllFreezerItems() async {

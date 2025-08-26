@@ -1,5 +1,6 @@
 import 'package:foodapi/foodapi.dart';
 import 'package:conduit_core/conduit_core.dart';
+import 'package:conduit_open_api/src/v3/response.dart';
 import 'package:foodapi/model/ingredient.dart';
 import 'package:foodapi/model/recipe.dart';
 
@@ -7,6 +8,36 @@ class RecipeIngredientController extends ResourceController {
   RecipeIngredientController(this.context);
 
   final ManagedContext context;
+
+  @override
+  Map<String, APIResponse> documentOperationResponses(
+    context, 
+    Operation operation
+  ) {
+    if (operation.method == "GET") {
+      return {
+        "200": APIResponse.schema("Список ингредиентов рецептов", context.schema['RecipeIngredient']),
+        "404": APIResponse("Ингредиент рецепта не найден")
+      };
+    } else if (operation.method == "POST") {
+      return {
+        "200": APIResponse.schema("Ингредиент рецепта создан", context.schema['RecipeIngredient']),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "PUT") {
+      return {
+        "200": APIResponse.schema("Ингредиент рецепта обновлён", context.schema['RecipeIngredient']),
+        "404": APIResponse("Ингредиент рецепта не найден"),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "DELETE") {
+      return {
+        "200": APIResponse("Ингредиент рецепта успешно удалён"),
+        "404": APIResponse("Ингредиент рецепта не найден")
+      };
+    }
+    return {};
+  }
 
   @Operation.get()
   Future<Response> getAllRecipeIngredients(

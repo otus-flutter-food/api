@@ -1,4 +1,5 @@
 import 'package:conduit_core/conduit_core.dart';
+import 'package:conduit_open_api/src/v3/response.dart';
 import '../model/comment.dart';
 import '../model/user.dart';
 import '../model/recipe.dart';
@@ -7,6 +8,36 @@ class CommentController extends ResourceController {
   CommentController(this.context);
   
   final ManagedContext context;
+  
+  @override
+  Map<String, APIResponse> documentOperationResponses(
+    context, 
+    Operation operation
+  ) {
+    if (operation.method == "GET") {
+      return {
+        "200": APIResponse.schema("Список комментариев", context.schema['Comment']),
+        "404": APIResponse("Комментарий не найден")
+      };
+    } else if (operation.method == "POST") {
+      return {
+        "200": APIResponse.schema("Комментарий создан", context.schema['Comment']),
+        "400": APIResponse("Ошибка валидации (неверный user ID или recipe ID)")
+      };
+    } else if (operation.method == "PUT") {
+      return {
+        "200": APIResponse.schema("Комментарий обновлён", context.schema['Comment']),
+        "404": APIResponse("Комментарий не найден"),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "DELETE") {
+      return {
+        "200": APIResponse("Комментарий успешно удалён"),
+        "404": APIResponse("Комментарий не найден")
+      };
+    }
+    return {};
+  }
   
   @Operation.get()
   Future<Response> getAllComments({

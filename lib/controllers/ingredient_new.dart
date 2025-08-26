@@ -1,5 +1,6 @@
 import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_postgresql/conduit_postgresql.dart';
+import 'package:conduit_open_api/src/v3/response.dart';
 import '../model/ingredient.dart';
 import '../model/freezer.dart';
 import '../middleware/naming_middleware.dart';
@@ -9,6 +10,37 @@ class IngredientController extends NamingController {
   IngredientController(this.context);
   
   final ManagedContext context;
+  
+  @override
+  Map<String, APIResponse> documentOperationResponses(
+    context, 
+    Operation operation
+  ) {
+    if (operation.method == "GET") {
+      return {
+        "200": APIResponse.schema("Список ингредиентов", context.schema['Ingredient']),
+        "404": APIResponse("Ингредиент не найден")
+      };
+    } else if (operation.method == "POST") {
+      return {
+        "200": APIResponse.schema("Ингредиент создан", context.schema['Ingredient']),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "PUT") {
+      return {
+        "200": APIResponse.schema("Ингредиент обновлён", context.schema['Ingredient']),
+        "404": APIResponse("Ингредиент не найден"),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "DELETE") {
+      return {
+        "200": APIResponse("Ингредиент успешно удалён"),
+        "404": APIResponse("Ингредиент не найден"),
+        "409": APIResponse("Нельзя удалить ингредиент, используемый в рецептах")
+      };
+    }
+    return {};
+  }
   
   @Operation.get()
   Future<Response> getAllIngredients() async {

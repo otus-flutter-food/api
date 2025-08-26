@@ -8,11 +8,13 @@ REST API для приложения рецептов, разработанны�
 - Полноценная авторизация с Bearer токенами
 - Профиль пользователя с расширенными данными
 - CRUD операции для рецептов, ингредиентов, шагов
-- Поиск и фильтрация с пагинацией
-- Избранные рецепты для пользователей
-- Комментарии к рецептам
-- Морозильник (учет продуктов)
+- Поиск и фильтрация с пагинацией (включая специальный /recipe/search endpoint)
+- Избранные рецепты для пользователей (публичный и защищенный доступ)
+- Комментарии к рецептам (публичные CRUD операции)
+- Морозильник - учет продуктов с количеством (полный CRUD)
+- Единицы измерения для ингредиентов
 - Связь рецептов с ингредиентами и шагами
+- Поддержка camelCase для Flutter клиентов
 
 ## Требования
 
@@ -57,7 +59,7 @@ dart run bin/main.dart
 
 #### Рецепты - ПОЛНОСТЬЮ РАБОТАЮТ ✅
 
-**GET /recipes** - Получить список рецептов с пагинацией и фильтрами
+**GET /recipe** - Получить список рецептов с пагинацией и фильтрами
 - Query параметры:
   - `page` (int) - номер страницы (по умолчанию 1)
   - `limit` (int) - количество элементов на странице (по умолчанию 20)
@@ -67,7 +69,10 @@ dart run bin/main.dart
 
 Пример:
 ```bash
-curl https://foodapi.dzolotov.pro/recipes?page=1&limit=10&search=блин
+curl https://foodapi.dzolotov.pro/recipe?page=1&limit=10&search=блин
+
+# ИЛИ использовать search endpoint
+curl "https://foodapi.dzolotov.pro/recipe/search?q=блин&page=1&limit=10"
 ```
 
 Ответ:
@@ -90,14 +95,14 @@ curl https://foodapi.dzolotov.pro/recipes?page=1&limit=10&search=блин
 }
 ```
 
-**GET /recipes/{id}** - Получить рецепт по ID с полной информацией (включая шаги, ингредиенты, комментарии)
+**GET /recipe/{id}** - Получить рецепт по ID с полной информацией (включая шаги, ингредиенты, комментарии)
 ```bash
-curl https://foodapi.dzolotov.pro/recipes/1
+curl https://foodapi.dzolotov.pro/recipe/1
 ```
 
-**POST /recipes** - Создать новый рецепт
+**POST /recipe** - Создать новый рецепт
 ```bash
-curl -X POST https://foodapi.dzolotov.pro/recipes \
+curl -X POST https://foodapi.dzolotov.pro/recipe \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Новый рецепт",
@@ -106,9 +111,9 @@ curl -X POST https://foodapi.dzolotov.pro/recipes \
   }'
 ```
 
-**PUT /recipes/{id}** - Обновить рецепт
+**PUT /recipe/{id}** - Обновить рецепт
 ```bash
-curl -X PUT https://foodapi.dzolotov.pro/recipes/1 \
+curl -X PUT https://foodapi.dzolotov.pro/recipe/1 \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Обновленное название",
@@ -116,9 +121,9 @@ curl -X PUT https://foodapi.dzolotov.pro/recipes/1 \
   }'
 ```
 
-**DELETE /recipes/{id}** - Удалить рецепт (каскадно удаляет связанные данные)
+**DELETE /recipe/{id}** - Удалить рецепт (каскадно удаляет связанные данные)
 ```bash
-curl -X DELETE https://foodapi.dzolotov.pro/recipes/1
+curl -X DELETE https://foodapi.dzolotov.pro/recipe/1
 ```
 
 #### Шаги рецептов
@@ -162,8 +167,23 @@ curl -X POST https://foodapi.dzolotov.pro/ingredient \
   -d '{
     "name": "Мёд",
     "caloriesForUnit": 3.04,
-    "measureunit": {"id": 1}
+    "measureunit_id": 1
   }'
+```
+
+Ответ:
+```json
+{
+  "id": 13,
+  "name": "Мёд",
+  "caloriesForUnit": 3.04,
+  "measureunit": {
+    "id": 1,
+    "one": "грамм",
+    "few": "грамма",
+    "many": "граммов"
+  }
+}
 ```
 
 **PUT /ingredient/{id}** - Обновить ингредиент
@@ -186,6 +206,101 @@ curl -X DELETE https://foodapi.dzolotov.pro/ingredient/12
 **GET /measure_unit** - Получить единицы измерения
 ```bash
 curl https://foodapi.dzolotov.pro/measure_unit
+```
+
+Ответ:
+```json
+[
+  {
+    "id": 1,
+    "one": "грамм",
+    "few": "грамма",
+    "many": "граммов"
+  },
+  {
+    "id": 2,
+    "one": "штука",
+    "few": "штуки",
+    "many": "штук"
+  }
+]
+```
+
+#### Избранное (публичный доступ)
+
+**GET /favorite** - Получить все избранные рецепты
+```bash
+curl https://foodapi.dzolotov.pro/favorite
+```
+
+**POST /favorite** - Добавить рецепт в избранное
+```bash
+curl -X POST https://foodapi.dzolotov.pro/favorite \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user": {"id": 1},
+    "recipe": {"id": 2}
+  }'
+```
+
+#### Морозилка
+
+**GET /freezer** - Получить содержимое морозилки
+```bash
+curl https://foodapi.dzolotov.pro/freezer
+```
+
+Ответ:
+```json
+[
+  {
+    "id": 1,
+    "count": 750.0,
+    "user": {"id": 1, "login": "test@example.com"},
+    "ingredient": {"id": 3}
+  }
+]
+```
+
+**POST /freezer** - Добавить продукт в морозилку
+```bash
+curl -X POST https://foodapi.dzolotov.pro/freezer \
+  -H "Content-Type: application/json" \
+  -d '{
+    "count": 500.0,
+    "user": {"id": 1},
+    "ingredient": {"id": 2}
+  }'
+```
+
+**PUT /freezer/{id}** - Обновить количество продукта
+```bash
+curl -X PUT https://foodapi.dzolotov.pro/freezer/1 \
+  -H "Content-Type: application/json" \
+  -d '{"count": 900.0}'
+```
+
+**DELETE /freezer/{id}** - Удалить продукт из морозилки
+```bash
+curl -X DELETE https://foodapi.dzolotov.pro/freezer/1
+```
+
+#### Комментарии (публичный доступ)
+
+**GET /comment** - Получить все комментарии
+```bash
+curl https://foodapi.dzolotov.pro/comment
+```
+
+**POST /comment** - Добавить комментарий (требует правильной структуры JSON)
+```bash
+curl -X POST https://foodapi.dzolotov.pro/comment \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Отличный рецепт!",
+    "user": {"id": 1},
+    "recipe": {"id": 1}
+  }'
 ```
 
 #### Ингредиенты рецептов
@@ -421,6 +536,41 @@ curl -X DELETE https://foodapi.dzolotov.pro/user/comments/1 \
 }
 ```
 
+### Freezer
+```json
+{
+  "id": 1,
+  "count": 750.0,
+  "user": {"id": 1, "login": "test@example.com"},
+  "ingredient": {"id": 3}
+}
+```
+
+### Ingredient
+```json
+{
+  "id": 2,
+  "name": "Мука пшеничная",
+  "caloriesForUnit": 3.5,
+  "measureunit": {
+    "id": 1,
+    "one": "грамм",
+    "few": "грамма",
+    "many": "граммов"
+  }
+}
+```
+
+### MeasureUnit
+```json
+{
+  "id": 1,
+  "one": "грамм",
+  "few": "грамма",
+  "many": "граммов"
+}
+```
+
 ## Миграции
 
 Проект использует систему миграций Conduit для управления схемой базы данных.
@@ -490,8 +640,8 @@ API полностью поддерживает выполнение домаш�
 - ✅ Figma дизайн: https://www.figma.com/...
 
 ### M2 - Навигация
-- ✅ Список рецептов (GET /recipes)
-- ✅ Детали рецепта (GET /recipes/{id})
+- ✅ Список рецептов (GET /recipe)
+- ✅ Детали рецепта (GET /recipe/{id})
 
 ### M3 - Списки и сетки
 - ✅ Пагинация списков
@@ -549,6 +699,8 @@ services:
 1. **Ошибка сериализации ManagedObject** - решена использованием .asMap()
 2. **UUID токен возвращал closure** - исправлено вызовом .v4() вместо .v4.toString()
 3. **Конфликт портов PostgreSQL** - используется порт 5433 вместо 5432
+4. **Search endpoint JSON сериализация** - исправлена в RecipeSearchController (v0.3.1)
+5. **POST /comment JSON декодирование** - требует вложенные объекты {"user": {"id": 1}}
 
 ## Тестирование
 
@@ -556,12 +708,27 @@ services:
 
 ### Быстрый тест:
 ```bash
-# Регистрация
+# Получение ингредиентов
+curl https://foodapi.dzolotov.pro/ingredient
+
+# Получение единиц измерения
+curl https://foodapi.dzolotov.pro/measure_unit
+
+# Получение морозилки
+curl https://foodapi.dzolotov.pro/freezer
+
+# Получение избранного
+curl https://foodapi.dzolotov.pro/favorite
+
+# Поиск рецептов
+curl "https://foodapi.dzolotov.pro/recipe/search?q=блин"
+
+# Регистрация пользователя
 curl -X POST https://foodapi.dzolotov.pro/user \
   -H "Content-Type: application/json" \
   -d '{"login": "test@test.com", "password": "test123"}'
 
-# Вход
+# Вход в систему
 TOKEN=$(curl -X PUT https://foodapi.dzolotov.pro/user \
   -H "Content-Type: application/json" \
   -d '{"login": "test@test.com", "password": "test123"}' | jq -r .token)
@@ -569,4 +736,9 @@ TOKEN=$(curl -X PUT https://foodapi.dzolotov.pro/user \
 # Проверка авторизации
 curl https://foodapi.dzolotov.pro/user/profile \
   -H "Authorization: Bearer $TOKEN"
+
+# Добавление продукта в морозилку
+curl -X POST https://foodapi.dzolotov.pro/freezer \
+  -H "Content-Type: application/json" \
+  -d '{"count": 250.0, "user": {"id": 1}, "ingredient": {"id": 2}}'
 ```

@@ -1,5 +1,6 @@
 import 'package:foodapi/foodapi.dart';
 import 'package:conduit_core/conduit_core.dart';
+import 'package:conduit_open_api/src/v3/response.dart';
 import 'package:foodapi/model/recipe.dart';
 
 class RecipeStepController extends ResourceController {
@@ -7,10 +8,48 @@ class RecipeStepController extends ResourceController {
 
   final ManagedContext context;
 
+  @override
+  Map<String, APIResponse> documentOperationResponses(
+    context, 
+    Operation operation
+  ) {
+    if (operation.method == "GET") {
+      return {
+        "200": APIResponse.schema("Список шагов рецептов", context.schema['RecipeStep']),
+        "404": APIResponse("Шаг не найден")
+      };
+    } else if (operation.method == "POST") {
+      return {
+        "200": APIResponse.schema("Шаг создан", context.schema['RecipeStep']),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "PUT") {
+      return {
+        "200": APIResponse.schema("Шаг обновлён", context.schema['RecipeStep']),
+        "404": APIResponse("Шаг не найден"),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "DELETE") {
+      return {
+        "200": APIResponse("Шаг успешно удалён"),
+        "404": APIResponse("Шаг не найден"),
+        "400": APIResponse("Нельзя удалить шаг, связанный с рецептами")
+      };
+    }
+    return {};
+  }
+
   @Operation.get()
-  Future<Response> getAllSteps() async {
+  Future<Response> getAllSteps({
+    @Bind.query('name') String? name,
+  }) async {
     final query = Query<RecipeStep>(context)
       ..join(set: (s) => s.recipeStepLinks);
+    
+    // Добавляем поиск по имени если параметр передан
+    if (name != null && name.isNotEmpty) {
+      query.where((s) => s.name).contains(name, caseSensitive: false);
+    }
     
     final steps = await query.fetch();
     return Response.ok(steps);
@@ -83,15 +122,4 @@ class RecipeStepController extends ResourceController {
     return Response.ok({'message': 'Step deleted successfully'});
   }
 
-  @Operation.get('search')
-  Future<Response> searchSteps(@Bind.query('name') String? name) async {
-    final query = Query<RecipeStep>(context);
-    
-    if (name != null && name.isNotEmpty) {
-      query.where((s) => s.name).contains(name, caseSensitive: false);
-    }
-    
-    final steps = await query.fetch();
-    return Response.ok(steps);
-  }
 }

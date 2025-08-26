@@ -1,10 +1,30 @@
 import 'package:conduit_core/conduit_core.dart';
+import 'package:conduit_open_api/src/v3/response.dart';
+import 'package:conduit_open_api/src/v3/schema.dart';
 import '../model/ingredient.dart';
 
 class MeasureUnitController extends ResourceController {
   MeasureUnitController(this.context);
   
   final ManagedContext context;
+  
+  @override
+  Map<String, APIResponse> documentOperationResponses(
+    context, 
+    Operation operation
+  ) {
+    if (operation.method == "GET") {
+      return {
+        "200": APIResponse.schema("Список единиц измерения", context.schema['MeasureUnit'])
+      };
+    } else if (operation.method == "POST") {
+      return {
+        "200": APIResponse.schema("Единица измерения создана", context.schema['MeasureUnit'])
+      };
+    }
+    return {};
+  }
+  
   
   @Operation.get()
   Future<Response> getAllUnits() async {

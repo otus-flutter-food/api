@@ -1,4 +1,5 @@
 import 'package:conduit_core/conduit_core.dart';
+import 'package:conduit_open_api/src/v3/response.dart';
 import '../model/favorite.dart';
 import '../model/user.dart';
 import '../model/recipe.dart';
@@ -7,6 +8,31 @@ class FavoriteController extends ResourceController {
   FavoriteController(this.context);
   
   final ManagedContext context;
+  
+  @override
+  Map<String, APIResponse> documentOperationResponses(
+    context, 
+    Operation operation
+  ) {
+    if (operation.method == "GET") {
+      return {
+        "200": APIResponse.schema("Список избранных рецептов", context.schema['Favorite']),
+        "404": APIResponse("Избранное не найдено")
+      };
+    } else if (operation.method == "POST") {
+      return {
+        "200": APIResponse.schema("Рецепт добавлен в избранное", context.schema['Favorite']),
+        "400": APIResponse("Ошибка валидации (неверный user ID или recipe ID)"),
+        "409": APIResponse("Рецепт уже в избранном")
+      };
+    } else if (operation.method == "DELETE") {
+      return {
+        "200": APIResponse("Рецепт удалён из избранного"),
+        "404": APIResponse("Избранное не найдено")
+      };
+    }
+    return {};
+  }
   
   @Operation.get()
   Future<Response> getAllFavorites() async {

@@ -1,11 +1,42 @@
 import 'package:foodapi/foodapi.dart';
 import 'package:conduit_core/conduit_core.dart';
+import 'package:conduit_open_api/src/v3/response.dart';
 import 'package:foodapi/model/recipe.dart';
 
 class RecipeStepLinkController extends ResourceController {
   RecipeStepLinkController(this.context);
 
   final ManagedContext context;
+
+  @override
+  Map<String, APIResponse> documentOperationResponses(
+    context, 
+    Operation operation
+  ) {
+    if (operation.method == "GET") {
+      return {
+        "200": APIResponse.schema("Список связей шагов с рецептами", context.schema['RecipeStepLink']),
+        "404": APIResponse("Связь не найдена")
+      };
+    } else if (operation.method == "POST") {
+      return {
+        "200": APIResponse.schema("Связь создана", context.schema['RecipeStepLink']),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "PUT") {
+      return {
+        "200": APIResponse.schema("Связь обновлена", context.schema['RecipeStepLink']),
+        "404": APIResponse("Связь не найдена"),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "DELETE") {
+      return {
+        "200": APIResponse("Связь успешно удалена"),
+        "404": APIResponse("Связь не найдена")
+      };
+    }
+    return {};
+  }
 
   @Operation.get()
   Future<Response> getAllRecipeStepLinks(

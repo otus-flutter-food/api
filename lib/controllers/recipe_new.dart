@@ -1,4 +1,5 @@
 import 'package:conduit_core/conduit_core.dart';
+import 'package:conduit_open_api/src/v3/response.dart';
 import '../model/recipe.dart';
 import '../model/ingredient.dart';
 import '../model/comment.dart';
@@ -8,6 +9,36 @@ class RecipeController extends ResourceController {
   RecipeController(this.context);
   
   final ManagedContext context;
+  
+  @override
+  Map<String, APIResponse> documentOperationResponses(
+    context, 
+    Operation operation
+  ) {
+    if (operation.method == "GET") {
+      return {
+        "200": APIResponse.schema("Список рецептов", context.schema['Recipe']),
+        "404": APIResponse("Рецепт не найден")
+      };
+    } else if (operation.method == "POST") {
+      return {
+        "200": APIResponse.schema("Рецепт создан", context.schema['Recipe']),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "PUT") {
+      return {
+        "200": APIResponse.schema("Рецепт обновлён", context.schema['Recipe']),
+        "404": APIResponse("Рецепт не найден"),
+        "400": APIResponse("Ошибка валидации данных")
+      };
+    } else if (operation.method == "DELETE") {
+      return {
+        "200": APIResponse("Рецепт успешно удалён"),
+        "404": APIResponse("Рецепт не найден")
+      };
+    }
+    return {};
+  }
   
   @Operation.post()
   Future<Response> createRecipe(@Bind.body() Recipe recipe) async {
@@ -161,6 +192,20 @@ class RecipeSearchController extends ResourceController {
   
   final ManagedContext context;
   
+  @override
+  Map<String, APIResponse> documentOperationResponses(
+    context, 
+    Operation operation
+  ) {
+    if (operation.method == "GET") {
+      return {
+        "200": APIResponse.schema("Результаты поиска рецептов", context.schema['Recipe']),
+        "400": APIResponse("Неверные параметры поиска")
+      };
+    }
+    return {};
+  }
+  
   @Operation.get()
   Future<Response> searchRecipes({
     @Bind.query('q') String? query,
@@ -223,7 +268,7 @@ class RecipeSearchController extends ResourceController {
     final totalCount = await countQuery.reduce.count();
     
     return Response.ok({
-      'data': filteredRecipes,
+      'data': filteredRecipes.map((r) => r.asMap()).toList(),
       'pagination': {
         'page': pageNum,
         'limit': pageSize,

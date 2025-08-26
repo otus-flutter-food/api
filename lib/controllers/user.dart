@@ -10,6 +10,7 @@ class UserInfoController extends NamingController {
   UserInfoController(this.context);
 
   ManagedContext context;
+  
 
   @Operation.get("id")
   Future<Response> getUser(@Bind.path("id") String id) async {
@@ -28,26 +29,6 @@ class UserController extends NamingController {
 
   ManagedContext context;
 
-  @override
-  Map<String, APIResponse> documentOperationResponses(
-      APIDocumentContext context, Operation operation) {
-    if (operation.method == "PUT") {
-      return {
-        "200": APIResponse.schema("User is logged in", context.schema["Token"]),
-        "403": APIResponse.schema(
-          "User credentials are invalid",
-          context.schema["Error"],
-        ),
-      };
-    } else if (operation.method == "POST") {
-      return {
-        "200": APIResponse.schema("User is created", context.schema["Status"]),
-        "409": APIResponse.schema(
-            "User is already exists", context.schema["Error"])
-      };
-    } else
-      return {};
-  }
 
   @Operation.post()
   Future<Response> register() async {
