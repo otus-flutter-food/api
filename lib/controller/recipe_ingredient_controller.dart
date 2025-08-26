@@ -139,7 +139,7 @@ class RecipeIngredientController extends ResourceController {
         final recipeIngredient = RecipeIngredient()
           ..recipe = Recipe()..id = ingredient['recipeId'] as int
           ..ingredient = Ingredient()..id = ingredient['ingredientId'] as int
-          ..count = ingredient['count'] as int?;
+          ..count = ingredient['count'] as double?;
         
         final query = Query<RecipeIngredient>(transaction)
           ..values = recipeIngredient;

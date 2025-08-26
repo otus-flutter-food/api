@@ -125,7 +125,7 @@ class FoodapiChannel extends ApplicationChannel {
     // Регистрируем схему для RecipeIngredient
     registry.schema.register('RecipeIngredient', APISchemaObject.object({
       'id': APISchemaObject.integer(),
-      'count': APISchemaObject.integer(),
+      'count': APISchemaObject.number(),
       'recipe': APISchemaObject.object({
         'id': APISchemaObject.integer(),
         'name': APISchemaObject.string(),

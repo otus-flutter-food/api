@@ -54,5 +54,5 @@ class _RecipeIngredient {
   Recipe? recipe;
 
   @Column()
-  int? count;
+  double? count;
 }
