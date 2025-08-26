@@ -14,8 +14,9 @@ class HealthController extends ResourceController {
   @Operation('HEAD')
   Future<Response> checkHealthHead() async {
     final result = await _performHealthCheck();
-    // Для HEAD запроса возвращаем только статус код без тела
-    return Response(result.statusCode ?? 200, null, {});
+    // Для HEAD запроса возвращаем статус код с заголовками но без тела
+    final headers = Map<String, dynamic>.from(result.headers ?? {});
+    return Response(result.statusCode ?? 200, headers, null);
   }
 
   Future<Response> _performHealthCheck() async {
