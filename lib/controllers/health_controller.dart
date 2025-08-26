@@ -15,7 +15,7 @@ class HealthController extends ResourceController {
   Future<Response> checkHealthHead() async {
     final result = await _performHealthCheck();
     // Для HEAD запроса возвращаем только статус код без тела
-    return Response(result.statusCode, null, {});
+    return Response(result.statusCode ?? 200, null, {});
   }
 
   Future<Response> _performHealthCheck() async {
