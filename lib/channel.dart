@@ -25,6 +25,9 @@ import 'controller/recipe_ingredient_controller.dart';
 import 'controllers/user_profile_controller.dart';
 import 'middleware/auth_middleware.dart';
 
+// Health check controller
+import 'controllers/health_controller.dart';
+
 
 class FoodapiChannel extends ApplicationChannel {
   late ManagedContext context;
@@ -180,6 +183,9 @@ class FoodapiChannel extends ApplicationChannel {
   @override
   Controller get entryPoint {
     final router = Router();
+    
+    // Health check endpoint (no auth required, no logging)
+    router.route("/healthz").link(() => HealthController(context));
     
     // Logging middleware
     router.route("/[:path(.*)]")
