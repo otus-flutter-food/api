@@ -333,14 +333,14 @@ curl "https://foodapi.dzolotov.pro/comment?recipeId=1"
 curl "https://foodapi.dzolotov.pro/comment?userId=1"
 ```
 
-**POST /comment** - Добавить комментарий (требует правильной структуры JSON)
+**POST /comment** - Добавить комментарий (с авторизацией автор определяется автоматически)
 ```bash
 curl -X POST https://foodapi.dzolotov.pro/comment \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {token}" \
   -d '{
-    "text": "Отличный рецепт!",
+    "text": "Отличный рецепт",
     "photo": "https://example.com/my-photo.jpg",
-    "user": {"id": 1},
     "recipe": {"id": 1}
   }'
 ```
@@ -796,7 +796,7 @@ curl -X POST https://foodapi.dzolotov.pro/user/comments \
   -H "Content-Type: application/json" \
   -d '{
     "recipeId": 1,
-    "text": "Отличный рецепт!"
+    "text": "Отличный рецепт"
   }'
 ```
 
@@ -1102,23 +1102,25 @@ BEET_ID=$(curl -X POST https://foodapi.dzolotov.pro/ingredient \
   }' | jq -r '.id')
 
 # Привязываем ингредиент к рецепту (поддерживаются дробные значения!)
-curl -X POST https://foodapi.dzolotov.pro/recipe-ingredients \
+# Ответ содержит ID связи (INGREDIENT_LINK_ID), который нужен для обновления
+INGREDIENT_LINK_ID=$(curl -X POST https://foodapi.dzolotov.pro/recipe-ingredients \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
     \"recipe\": {\"id\": $RECIPE_ID},
     \"ingredient\": {\"id\": $BEET_ID},
     \"count\": 300.5
-  }"
+  }" | jq -r '.id')
+echo "Создана связь рецепт-ингредиент ID: $INGREDIENT_LINK_ID"
 
-# Добавляем существующие ингредиенты (например, 1.5 литра воды)
+# Добавляем существующие ингредиенты (например, 0.5 кг картошки)
 curl -X POST https://foodapi.dzolotov.pro/recipe-ingredients \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
     \"recipe\": {\"id\": $RECIPE_ID},
     \"ingredient\": {\"id\": 27},
-    \"count\": 1500.0
+    \"count\": 0.5
   }"
 ```
 
@@ -1130,25 +1132,29 @@ STEP1_ID=$(curl -X POST https://foodapi.dzolotov.pro/steps \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
-    "name": "Подготовить овощи: свеклу натереть на крупной терке, морковь и лук нарезать"
+    "name": "Подготовить овощи: свеклу натереть на крупной терке, морковь и лук нарезать",
+    "duration": 900
   }' | jq -r '.id')
 
 # Привязываем шаг к рецепту
-curl -X POST https://foodapi.dzolotov.pro/recipe-step-links \
+# Ответ содержит ID связи (STEP_LINK_ID), который нужен для изменения порядка
+STEP_LINK_ID=$(curl -X POST https://foodapi.dzolotov.pro/recipe-step-links \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
-    \"recipeId\": $RECIPE_ID,
-    \"stepId\": $STEP1_ID,
+    \"recipe\": {\"id\": $RECIPE_ID},
+    \"step\": {\"id\": $STEP1_ID},
     \"number\": 1
-  }"
+  }" | jq -r '.id')
+echo "Создана связь рецепт-шаг ID: $STEP_LINK_ID"
 
 # Создаем второй шаг
 STEP2_ID=$(curl -X POST https://foodapi.dzolotov.pro/steps \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
-    "name": "В кипящий бульон добавить картофель, варить 10 минут"
+    "name": "В кипящий бульон добавить картофель, варить 10 минут",
+    "duration": 600
   }' | jq -r '.id')
 
 # Привязываем второй шаг
@@ -1156,8 +1162,8 @@ curl -X POST https://foodapi.dzolotov.pro/recipe-step-links \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
-    \"recipeId\": $RECIPE_ID,
-    \"stepId\": $STEP2_ID,
+    \"recipe\": {\"id\": $RECIPE_ID},
+    \"step\": {\"id\": $STEP2_ID},
     \"number\": 2
   }"
 
@@ -1166,15 +1172,16 @@ STEP3_ID=$(curl -X POST https://foodapi.dzolotov.pro/steps \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
-    "name": "Добавить свеклу и тушеные овощи, варить еще 15 минут"
+    "name": "Добавить свеклу и тушеные овощи, варить еще 15 минут",
+    "duration": 900
   }' | jq -r '.id')
 
 curl -X POST https://foodapi.dzolotov.pro/recipe-step-links \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
-    \"recipeId\": $RECIPE_ID,
-    \"stepId\": $STEP3_ID,
+    \"recipe\": {\"id\": $RECIPE_ID},
+    \"step\": {\"id\": $STEP3_ID},
     \"number\": 3
   }"
 ```
@@ -1203,28 +1210,34 @@ curl -X PUT "https://foodapi.dzolotov.pro/recipe/$RECIPE_ID" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
-    "name": "Борщ украинский с пампушками",
+    "name": "Борщ с пампушками",
     "duration": 9000,
     "photo": "https://example.com/borsch-updated.jpg"
   }'
 
-# Изменить количество ингредиента
+# Получить список ингредиентов рецепта (чтобы найти INGREDIENT_LINK_ID)
+curl "https://foodapi.dzolotov.pro/recipe-ingredients/recipe/$RECIPE_ID" \
+  -H "Authorization: Bearer $TOKEN"
+# Ответ содержит массив с полем "id" - это и есть INGREDIENT_LINK_ID для каждой связи
+
+# Изменить количество ингредиента (используя INGREDIENT_LINK_ID из предыдущего запроса)
 curl -X PUT "https://foodapi.dzolotov.pro/recipe-ingredients/$INGREDIENT_LINK_ID" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
-    \"recipeId\": $RECIPE_ID,
-    \"ingredientId\": $BEET_ID,
     \"count\": 400
   }"
 
-# Изменить порядок шага
+# Получить список шагов рецепта (чтобы найти STEP_LINK_ID)
+curl "https://foodapi.dzolotov.pro/recipe-step-links/recipe/$RECIPE_ID" \
+  -H "Authorization: Bearer $TOKEN"
+# Ответ содержит массив с полем "id" - это и есть STEP_LINK_ID для каждой связи
+
+# Изменить порядок шага (используя STEP_LINK_ID из предыдущего запроса)
 curl -X PUT "https://foodapi.dzolotov.pro/recipe-step-links/$STEP_LINK_ID" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
-    \"recipeId\": $RECIPE_ID,
-    \"stepId\": $STEP3_ID,
     \"number\": 4
   }"
 ```
@@ -1245,10 +1258,40 @@ curl -X POST https://foodapi.dzolotov.pro/recipe-ingredients \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
-    \"recipeId\": $RECIPE_ID,
-    \"ingredientId\": $BEET_ID,
+    \"recipe\": {\"id\": $RECIPE_ID},
+    \"ingredient\": {\"id\": $BEET_ID},
     \"count\": 250
   }"
+```
+
+### ⭐ Дополнительные операции
+
+```bash
+# Добавить рецепт в избранное
+curl -X POST https://foodapi.dzolotov.pro/user/favorites/$RECIPE_ID \
+  -H "Authorization: Bearer $TOKEN"
+echo "Рецепт добавлен в избранное"
+
+# Получить список избранных рецептов
+curl https://foodapi.dzolotov.pro/user/favorites \
+  -H "Authorization: Bearer $TOKEN"
+
+# Добавить комментарий к рецепту (автор определяется по токену)
+curl -X POST https://foodapi.dzolotov.pro/comment \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d "{
+    \"recipe\": {\"id\": $RECIPE_ID},
+    \"text\": \"Отличный рецепт борща\"
+  }"
+
+# Получить комментарии к рецепту
+curl "https://foodapi.dzolotov.pro/comment?recipeId=$RECIPE_ID"
+
+# Удалить рецепт из избранного
+curl -X DELETE "https://foodapi.dzolotov.pro/user/favorites/$RECIPE_ID" \
+  -H "Authorization: Bearer $TOKEN"
+echo "Рецепт удален из избранного"
 ```
 
 ### 🗑️ Удаление
@@ -1265,33 +1308,6 @@ curl -X DELETE "https://foodapi.dzolotov.pro/steps/$STEP1_ID" \
 # Удалить весь рецепт (автоматически удалит все связи)
 curl -X DELETE "https://foodapi.dzolotov.pro/recipe/$RECIPE_ID" \
   -H "Authorization: Bearer $TOKEN"
-```
-
-### ⭐ Дополнительные операции
-
-```bash
-# Добавить в избранное
-curl -X POST https://foodapi.dzolotov.pro/favorite \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d "{
-    \"recipe\": {\"id\": $RECIPE_ID},
-    \"user\": {\"id\": 1}
-  }"
-
-# Добавить комментарий
-curl -X POST https://foodapi.dzolotov.pro/comment \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d "{
-    \"recipe\": {\"id\": $RECIPE_ID},
-    \"user\": {\"id\": 1},
-    \"text\": \"Отличный рецепт борща!\"
-  }"
-
-# Поиск рецептов
-curl -X GET "https://foodapi.dzolotov.pro/recipe/search?q=борщ&page=1&limit=10" \
-  -H "Authorization: Bearer $TOKEN" | jq '.'
 ```
 
 ## Тестирование

@@ -87,12 +87,32 @@ class CommentController extends ResourceController {
   @Operation.post()
   Future<Response> createComment() async {
     final Map<String, dynamic> body = await request!.body.decode();
-    final userId = int.tryParse((body['userId'] ?? body['user']?['id'])?.toString() ?? '');
+    
+    // Получаем userId из токена авторизации (если есть)
+    int? userId;
+    final authHeader = request!.raw.headers['authorization']?.first;
+    if (authHeader != null && authHeader.startsWith('Bearer ')) {
+      final token = authHeader.substring(7);
+      final store = context.persistentStore as PostgreSQLPersistentStore;
+      final userRows = await store.execute(
+        'SELECT user_id FROM _authtoken WHERE token = @token',
+        substitutionValues: {'token': token}
+      ) as List<List<dynamic>>;
+      if (userRows.isNotEmpty) {
+        userId = userRows.first.first as int;
+      }
+    }
+    
+    // Если токена нет, пытаемся получить userId из body (для обратной совместимости)
+    if (userId == null) {
+      userId = int.tryParse((body['userId'] ?? body['user']?['id'])?.toString() ?? '');
+    }
+    
     final recipeId = int.tryParse((body['recipeId'] ?? body['recipe']?['id'])?.toString() ?? '');
     final text = body['text']?.toString();
     final photo = body['photo']?.toString();
     if (userId == null || recipeId == null || text == null) {
-      return Response.badRequest(body: {'error': 'userId/user.id, recipeId/recipe.id and text are required'});
+      return Response.badRequest(body: {'error': 'Authorization required or userId/user.id must be provided. recipeId/recipe.id and text are required'});
     }
     final store = context.persistentStore as PostgreSQLPersistentStore;
     // Validate ids
