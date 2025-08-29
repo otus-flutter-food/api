@@ -95,7 +95,7 @@ class CommentController extends ResourceController {
       final token = authHeader.substring(7);
       final store = context.persistentStore as PostgreSQLPersistentStore;
       final userRows = await store.execute(
-        'SELECT user_id FROM _authtoken WHERE token = @token',
+        'SELECT id FROM _user WHERE token = @token',
         substitutionValues: {'token': token}
       ) as List<List<dynamic>>;
       if (userRows.isNotEmpty) {
