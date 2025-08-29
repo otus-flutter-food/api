@@ -22,7 +22,7 @@ class CommentController extends ResourceController {
     } else if (operation.method == "POST") {
       return {
         "200": APIResponse.schema("Комментарий создан", context.schema['Comment']),
-        "400": APIResponse("Ошибка валидации (неверный user ID или recipe ID)")
+        "400": APIResponse("Ошибка валидации (неверный recipe ID) или отсутствует авторизация")
       };
     } else if (operation.method == "PUT") {
       return {
@@ -37,6 +37,29 @@ class CommentController extends ResourceController {
       };
     }
     return {};
+  }
+  
+  @override
+  APIRequestBody? documentOperationRequestBody(context, Operation? operation) {
+    if (operation?.method == "POST") {
+      return APIRequestBody.schema(
+        APISchemaObject.object({
+          "recipe": APISchemaObject.object({"id": APISchemaObject.integer()}),
+          "text": APISchemaObject.string(),
+          "photo": APISchemaObject.string()..isNullable = true,
+        }),
+        description: "Данные комментария (автор определяется из токена авторизации)",
+      );
+    } else if (operation?.method == "PUT") {
+      return APIRequestBody.schema(
+        APISchemaObject.object({
+          "text": APISchemaObject.string()..isNullable = true,
+          "photo": APISchemaObject.string()..isNullable = true,
+        }),
+        description: "Обновленные данные комментария",
+      );
+    }
+    return null;
   }
   
   @Operation.get()

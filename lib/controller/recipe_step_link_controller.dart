@@ -21,6 +21,13 @@ class RecipeStepLinkController extends ResourceController {
         "404": APIResponse("Связь не найдена")
       };
     } else if (operation.method == "POST") {
+      // Для batch операций возвращаем массив
+      if (request?.path.segments.last == "batch") {
+        return {
+          "200": APIResponse.schema("Связи созданы", APISchemaObject.array(ofSchema: context.schema['RecipeStepLink'])),
+          "400": APIResponse("Ошибка валидации данных")
+        };
+      }
       return {
         "200": APIResponse.schema("Связь создана", context.schema['RecipeStepLink']),
         "400": APIResponse("Ошибка валидации данных")
@@ -38,6 +45,58 @@ class RecipeStepLinkController extends ResourceController {
       };
     }
     return {};
+  }
+  
+  @override
+  APIRequestBody? documentOperationRequestBody(context, Operation? operation) {
+    if (operation?.method == "POST") {
+      // Batch операция принимает массив
+      if (operation?.pathVariables?.contains("batch") ?? false) {
+        return APIRequestBody.schema(
+          APISchemaObject.array(
+            ofSchema: APISchemaObject.object({
+              "recipe": APISchemaObject.object({"id": APISchemaObject.integer()}),
+              "step": APISchemaObject.object({"id": APISchemaObject.integer()}),
+              "number": APISchemaObject.integer(),
+            })
+          ),
+          description: "Массив связей для создания",
+        );
+      }
+      // Обычный POST
+      return APIRequestBody.schema(
+        APISchemaObject.object({
+          "recipe": APISchemaObject.object({"id": APISchemaObject.integer()}),
+          "step": APISchemaObject.object({"id": APISchemaObject.integer()}),
+          "number": APISchemaObject.integer(),
+        }),
+        description: "Данные связи",
+      );
+    } else if (operation?.method == "PUT") {
+      // Для reorderSteps
+      if (operation?.pathVariables?.isEmpty ?? true) {
+        return APIRequestBody.schema(
+          APISchemaObject.object({
+            "recipeId": APISchemaObject.integer(),
+            "stepOrders": APISchemaObject.array(
+              ofSchema: APISchemaObject.object({
+                "linkId": APISchemaObject.integer(),
+                "number": APISchemaObject.integer(),
+              })
+            ),
+          }),
+          description: "Данные для переупорядочивания шагов",
+        );
+      }
+      // Обычный PUT для обновления
+      return APIRequestBody.schema(
+        APISchemaObject.object({
+          "number": APISchemaObject.integer(),
+        }),
+        description: "Обновленные данные связи",
+      );
+    }
+    return null;
   }
 
   @Operation.get()

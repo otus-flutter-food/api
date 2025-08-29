@@ -57,7 +57,7 @@ dart run bin/main.dart
 
 ### Публичные endpoints (без авторизации)
 
-#### Рецепты - ПОЛНОСТЬЮ РАБОТАЮТ ✅
+#### Рецепты
 
 **GET /recipe** - Получить список рецептов с пагинацией и фильтрами
 - Query параметры:
@@ -71,8 +71,11 @@ dart run bin/main.dart
 ```bash
 curl https://foodapi.dzolotov.pro/recipe?page=1&limit=10&search=блин
 
-# ИЛИ использовать search endpoint
-curl "https://foodapi.dzolotov.pro/recipe/search?q=блин&page=1&limit=10"
+# ИЛИ использовать search endpoint (для кириллицы нужна URL-кодировка)
+curl -G "https://foodapi.dzolotov.pro/recipe/search" \
+  --data-urlencode "q=блин" \
+  --data-urlencode "page=1" \
+  --data-urlencode "limit=10"
 ```
 
 Ответ:
@@ -639,7 +642,7 @@ curl https://foodapi.dzolotov.pro/user/1
 }
 ```
 
-### Авторизация - ПОЛНОСТЬЮ РАБОТАЕТ ✅
+### Авторизация
 
 **POST /user** - Регистрация нового пользователя
 ```bash
@@ -737,7 +740,7 @@ curl -X POST https://foodapi.dzolotov.pro/user/profile/logout \
   -H "Authorization: Bearer {token}"
 ```
 
-#### Избранное - ПОЛНОСТЬЮ РАБОТАЕТ ✅
+#### Избранное
 
 **GET /user/favorites** - Получить список избранных рецептов
 ```bash
@@ -1328,8 +1331,8 @@ curl https://foodapi.dzolotov.pro/freezer
 # Получение избранного
 curl https://foodapi.dzolotov.pro/favorite
 
-# Поиск рецептов
-curl "https://foodapi.dzolotov.pro/recipe/search?q=блин"
+# Поиск рецептов (с URL-кодировкой для кириллицы)
+curl -G "https://foodapi.dzolotov.pro/recipe/search" --data-urlencode "q=борщ"
 
 # Регистрация пользователя
 curl -X POST https://foodapi.dzolotov.pro/user \

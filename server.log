@@ -1,8 +1,0 @@
-[INFO] conduit: Server conduit/1 started.  
-Application started on 0.0.0.0:8897.
-Use Ctrl-C (SIGINT) to stop running the application.
-PUT /_comment/1 - Received body: {text: Debug columns}
-[INFO] conduit: PostgreSQL connecting, food@192.162.246.40:5432/food.  
-[WARNING] conduit: PostgreSQLSeverity.error 42703: column "datetime" does not exist Hint: Perhaps you meant to reference the column "_comment.dateTime".   
-Error updating: PostgreSQLSeverity.error 42703: column "datetime" does not exist Hint: Perhaps you meant to reference the column "_comment.dateTime". 
-[INFO] conduit: PUT /comment/1 643ms 500   

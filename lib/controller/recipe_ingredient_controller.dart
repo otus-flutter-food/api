@@ -22,6 +22,13 @@ class RecipeIngredientController extends ResourceController {
         "404": APIResponse("Ингредиент рецепта не найден")
       };
     } else if (operation.method == "POST") {
+      // Для batch операций возвращаем массив
+      if (request?.path.segments.last == "batch") {
+        return {
+          "200": APIResponse.schema("Ингредиенты рецепта созданы", APISchemaObject.array(ofSchema: context.schema['RecipeIngredient'])),
+          "400": APIResponse("Ошибка валидации данных")
+        };
+      }
       return {
         "200": APIResponse.schema("Ингредиент рецепта создан", context.schema['RecipeIngredient']),
         "400": APIResponse("Ошибка валидации данных")
@@ -39,6 +46,44 @@ class RecipeIngredientController extends ResourceController {
       };
     }
     return {};
+  }
+
+  @override
+  APIRequestBody? documentOperationRequestBody(context, Operation? operation) {
+    if (operation?.method == "POST") {
+      // Batch операция принимает массив
+      if (operation?.pathVariables?.contains("batch") ?? false) {
+        return APIRequestBody.schema(
+          APISchemaObject.array(
+            ofSchema: APISchemaObject.object({
+              "recipe": APISchemaObject.object({"id": APISchemaObject.integer()}),
+              "ingredient": APISchemaObject.object({"id": APISchemaObject.integer()}),
+              "count": APISchemaObject.number(),
+            })
+          ),
+          description: "Массив ингредиентов для создания",
+        );
+      }
+      // Обычный POST
+      return APIRequestBody.schema(
+        APISchemaObject.object({
+          "recipe": APISchemaObject.object({"id": APISchemaObject.integer()}),
+          "ingredient": APISchemaObject.object({"id": APISchemaObject.integer()}),
+          "count": APISchemaObject.number(),
+        }),
+        description: "Данные ингредиента рецепта",
+      );
+    } else if (operation?.method == "PUT") {
+      // Обычный PUT для обновления
+      return APIRequestBody.schema(
+        APISchemaObject.object({
+          "count": APISchemaObject.number(),
+          "ingredient": APISchemaObject.object({"id": APISchemaObject.integer()})..isNullable = true,
+        }),
+        description: "Обновленные данные ингредиента",
+      );
+    }
+    return null;
   }
 
   @Operation.get()
