@@ -53,6 +53,6 @@ class _RecipeIngredient {
   @Relate(#recipeIngredients)
   Recipe? recipe;
 
-  @Column()
+  @Column(databaseType: ManagedPropertyType.doublePrecision)
   double? count;
 }

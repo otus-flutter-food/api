@@ -46,6 +46,29 @@ class FoodapiChannel extends ApplicationChannel {
   void documentComponents(APIDocumentContext registry) {
     super.documentComponents(registry);
     
+    // User schemas
+    registry.schema.register('UserRef', APISchemaObject.object({
+      'id': APISchemaObject.integer(),
+    }));
+    registry.schema.register('UserPublic', APISchemaObject.object({
+      'id': APISchemaObject.integer(),
+      'login': APISchemaObject.string(),
+      'firstName': APISchemaObject.string()..isNullable = true,
+      'lastName': APISchemaObject.string()..isNullable = true,
+      'avatarUrl': APISchemaObject.string()..isNullable = true,
+      'phone': APISchemaObject.string()..isNullable = true,
+      'birthday': APISchemaObject.string()
+        ..format = 'date-time'
+        ..isNullable = true,
+    }));
+    registry.schema.register('AuthToken', APISchemaObject.object({
+      'token': APISchemaObject.string(),
+    }));
+    registry.schema.register('RegistrationResponse', APISchemaObject.object({
+      'status': APISchemaObject.string(),
+      'user': registry.schema['UserPublic'],
+    }));
+
     // Регистрируем схему для MeasureUnit
     registry.schema.register('MeasureUnit', APISchemaObject.object({
       'id': APISchemaObject.integer(),
@@ -70,15 +93,10 @@ class FoodapiChannel extends ApplicationChannel {
     // Регистрируем схему для Favorite
     registry.schema.register('Favorite', APISchemaObject.object({
       'id': APISchemaObject.integer(),
-      'user': APISchemaObject.object({
-        'id': APISchemaObject.integer(),
-        'login': APISchemaObject.string(),
-      }),
+      'user': registry.schema['UserRef'],
       'recipe': APISchemaObject.object({
         'id': APISchemaObject.integer(),
         'name': APISchemaObject.string(),
-        'duration': APISchemaObject.integer(),
-        'photo': APISchemaObject.string(),
       })
     }));
     
@@ -86,10 +104,7 @@ class FoodapiChannel extends ApplicationChannel {
     registry.schema.register('Freezer', APISchemaObject.object({
       'id': APISchemaObject.integer(),
       'count': APISchemaObject.number(),
-      'user': APISchemaObject.object({
-        'id': APISchemaObject.integer(),
-        'login': APISchemaObject.string(),
-      }),
+      'user': registry.schema['UserRef'],
       'ingredient': APISchemaObject.object({
         'id': APISchemaObject.integer(),
         'name': APISchemaObject.string(),
@@ -102,6 +117,16 @@ class FoodapiChannel extends ApplicationChannel {
       'name': APISchemaObject.string(),
       'duration': APISchemaObject.integer(),
       'photo': APISchemaObject.string(),
+    }));
+    // Пагинация для списка рецептов
+    registry.schema.register('PaginatedRecipes', APISchemaObject.object({
+      'data': APISchemaObject.array(ofSchema: registry.schema['Recipe']),
+      'pagination': APISchemaObject.object({
+        'page': APISchemaObject.integer(),
+        'limit': APISchemaObject.integer(),
+        'total': APISchemaObject.integer(),
+        'totalPages': APISchemaObject.integer(),
+      })
     }));
     
     // Регистрируем схему для RecipeStep
@@ -143,12 +168,9 @@ class FoodapiChannel extends ApplicationChannel {
     registry.schema.register('Comment', APISchemaObject.object({
       'id': APISchemaObject.integer(),
       'text': APISchemaObject.string(),
-      'photo': APISchemaObject.string(),
+      'photo': APISchemaObject.string()..isNullable = true,
       'dateTime': APISchemaObject.string()..format = 'date-time',
-      'user': APISchemaObject.object({
-        'id': APISchemaObject.integer(),
-        'login': APISchemaObject.string(),
-      }),
+      'user': registry.schema['UserRef'],
       'recipe': APISchemaObject.object({
         'id': APISchemaObject.integer(),
         'name': APISchemaObject.string(),
@@ -230,6 +252,10 @@ class FoodapiChannel extends ApplicationChannel {
     
     // User-specific endpoints (authentication required)
     router.route("/user/profile[/:path]")
+      .link(() => AuthMiddleware(context))!
+      .link(() => UserProfileController(context));
+    // Explicit logout endpoint for clarity
+    router.route("/user/profile/logout")
       .link(() => AuthMiddleware(context))!
       .link(() => UserProfileController(context));
     
