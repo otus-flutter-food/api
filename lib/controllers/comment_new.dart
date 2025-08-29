@@ -1,8 +1,8 @@
 import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_open_api/src/v3/response.dart';
+import 'package:conduit_open_api/v3.dart';
+import 'package:conduit_postgresql/conduit_postgresql.dart';
 import '../model/comment.dart';
-import '../model/user.dart';
-import '../model/recipe.dart';
 
 class CommentController extends ResourceController {
   CommentController(this.context);
@@ -16,7 +16,7 @@ class CommentController extends ResourceController {
   ) {
     if (operation.method == "GET") {
       return {
-        "200": APIResponse.schema("Список комментариев", context.schema['Comment']),
+        "200": APIResponse.schema("Список комментариев", APISchemaObject.array(ofSchema: context.schema['Comment'])),
         "404": APIResponse("Комментарий не найден")
       };
     } else if (operation.method == "POST") {
@@ -44,110 +44,86 @@ class CommentController extends ResourceController {
     @Bind.query('recipeId') int? recipeId,
     @Bind.query('userId') int? userId,
   }) async {
-    final query = Query<Comment>(context)
-      ..join(object: (c) => c.user)
-      ..join(object: (c) => c.recipe)
-      ..sortBy((c) => c.dateTime, QuerySortOrder.descending);
-    
-    if (recipeId != null) {
-      query.where((c) => c.recipe!.id).equalTo(recipeId);
-    }
-    
-    if (userId != null) {
-      query.where((c) => c.user!.id).equalTo(userId);
-    }
-    
-    final comments = await query.fetch();
-    
-    return Response.ok(comments.map((c) => c.asMap()).toList());
+    final store = context.persistentStore as PostgreSQLPersistentStore;
+    final where = <String>[];
+    final values = <String, dynamic>{};
+    if (recipeId != null) { where.add('c.recipe_id = @recipeId'); values['recipeId'] = recipeId; }
+    if (userId != null) { where.add('c.user_id = @userId'); values['userId'] = userId; }
+    final sql = 'SELECT c.id, c.text, c.photo, c.date_time, u.id as user_id, r.id as recipe_id, r.name '
+        'FROM _comment c '
+        'JOIN _user u ON u.id = c.user_id '
+        'JOIN _recipe r ON r.id = c.recipe_id '
+        '${where.isNotEmpty ? 'WHERE ' + where.join(' AND ') : ''} '
+        'ORDER BY c.date_time DESC';
+    final rows = await store.execute(sql, substitutionValues: values) as List<List<dynamic>>;
+    final data = rows.map((r) => {
+      'id': r[0],
+      'text': r[1],
+      'photo': r[2],
+      'dateTime': r[3]?.toString(),
+      'user': {'id': r[4]},
+      'recipe': {'id': r[5], 'name': r[6]},
+    }).toList();
+    return Response.ok(data);
   }
   
   @Operation.get('id')
   Future<Response> getCommentByID(@Bind.path('id') int id) async {
-    final query = Query<Comment>(context)
-      ..where((c) => c.id).equalTo(id)
-      ..join(object: (c) => c.user)
-      ..join(object: (c) => c.recipe);
-    
-    final comment = await query.fetchOne();
-    
-    if (comment == null) {
+    final store = context.persistentStore as PostgreSQLPersistentStore;
+    final rows = await store.execute(
+      'SELECT c.id, c.text, c.photo, c.date_time, u.id as user_id, r.id as recipe_id, r.name '
+      'FROM _comment c JOIN _user u ON u.id=c.user_id JOIN _recipe r ON r.id=c.recipe_id '
+      'WHERE c.id=@id', substitutionValues: {'id': id}) as List<List<dynamic>>;
+    if (rows.isEmpty) {
       return Response.notFound(body: {'error': 'Comment not found'});
     }
-    
-    return Response.ok(comment.asMap());
+    final r = rows.first;
+    return Response.ok({
+      'id': r[0], 'text': r[1], 'photo': r[2], 'dateTime': r[3]?.toString(),
+      'user': {'id': r[4]}, 'recipe': {'id': r[5], 'name': r[6]},
+    });
   }
   
   @Operation.post()
-  Future<Response> createComment(@Bind.body() Comment comment) async {
-    // Validate user exists
-    if (comment.user?.id != null) {
-      final userQuery = Query<User>(context)
-        ..where((u) => u.id).equalTo(comment.user!.id!);
-      
-      final user = await userQuery.fetchOne();
-      if (user == null) {
-        return Response.badRequest(body: {'error': 'Invalid user ID'});
-      }
+  Future<Response> createComment() async {
+    final Map<String, dynamic> body = await request!.body.decode();
+    final userId = int.tryParse((body['userId'] ?? body['user']?['id'])?.toString() ?? '');
+    final recipeId = int.tryParse((body['recipeId'] ?? body['recipe']?['id'])?.toString() ?? '');
+    final text = body['text']?.toString();
+    final photo = body['photo']?.toString();
+    if (userId == null || recipeId == null || text == null) {
+      return Response.badRequest(body: {'error': 'userId/user.id, recipeId/recipe.id and text are required'});
     }
-    
-    // Validate recipe exists
-    if (comment.recipe?.id != null) {
-      final recipeQuery = Query<Recipe>(context)
-        ..where((r) => r.id).equalTo(comment.recipe!.id!);
-      
-      final recipe = await recipeQuery.fetchOne();
-      if (recipe == null) {
-        return Response.badRequest(body: {'error': 'Invalid recipe ID'});
-      }
-    }
-    
-    // Set dateTime if not provided
-    if (comment.dateTime == null) {
-      comment.dateTime = DateTime.now();
-    }
-    
-    // Create comment
-    final query = Query<Comment>(context)
-      ..values = comment;
-    
-    final insertedComment = await query.insert();
-    
-    // Fetch with joins
-    final resultQuery = Query<Comment>(context)
-      ..where((c) => c.id).equalTo(insertedComment.id!)
-      ..join(object: (c) => c.user)
-      ..join(object: (c) => c.recipe);
-    
-    final result = await resultQuery.fetchOne();
-    
-    return Response.ok(result?.asMap() ?? insertedComment.asMap());
+    final store = context.persistentStore as PostgreSQLPersistentStore;
+    // Validate ids
+    final u = await store.execute('SELECT 1 FROM _user WHERE id=@id LIMIT 1', substitutionValues: {'id': userId});
+    if (u.isEmpty) return Response.badRequest(body: {'error': 'Invalid user ID'});
+    final r = await store.execute('SELECT 1 FROM _recipe WHERE id=@id LIMIT 1', substitutionValues: {'id': recipeId});
+    if (r.isEmpty) return Response.badRequest(body: {'error': 'Invalid recipe ID'});
+    // Insert
+    final rows = await store.execute(
+      'INSERT INTO _comment (user_id, recipe_id, text, photo, date_time) '
+      'VALUES (CAST(@uid AS int4), CAST(@rid AS int4), @text, @photo, NOW()) '
+      'RETURNING id',
+      substitutionValues: {'uid': userId, 'rid': recipeId, 'text': text, 'photo': photo},
+    ) as List<List<dynamic>>;
+    final id = rows.first.first as int;
+    return await getCommentByID(id);
   }
   
   @Operation.put('id')
   Future<Response> updateComment(
     @Bind.path('id') int id,
-    @Bind.body() Comment updatedComment,
   ) async {
-    final query = Query<Comment>(context)
-      ..where((c) => c.id).equalTo(id)
-      ..values = updatedComment;
-    
-    final comment = await query.updateOne();
-    
-    if (comment == null) {
-      return Response.notFound(body: {'error': 'Comment not found'});
-    }
-    
-    // Fetch with joins
-    final resultQuery = Query<Comment>(context)
-      ..where((c) => c.id).equalTo(id)
-      ..join(object: (c) => c.user)
-      ..join(object: (c) => c.recipe);
-    
-    final result = await resultQuery.fetchOne();
-    
-    return Response.ok(result?.asMap() ?? comment.asMap());
+    final Map<String, dynamic> body = await request!.body.decode();
+    final updates = <String>[];
+    final values = <String, dynamic>{'id': id};
+    if (body.containsKey('text')) { updates.add('text = @text'); values['text'] = body['text'].toString(); }
+    if (body.containsKey('photo')) { updates.add('photo = @photo'); values['photo'] = body['photo']?.toString(); }
+    if (updates.isEmpty) return Response.badRequest(body: {'error': 'No fields to update'});
+    final store = context.persistentStore as PostgreSQLPersistentStore;
+    await store.execute('UPDATE _comment SET ${updates.join(', ')} WHERE id = @id', substitutionValues: values);
+    return await getCommentByID(id);
   }
   
   @Operation.delete('id')

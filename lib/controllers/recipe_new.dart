@@ -17,7 +17,7 @@ class RecipeController extends ResourceController {
   ) {
     if (operation.method == "GET") {
       return {
-        "200": APIResponse.schema("Список рецептов", context.schema['Recipe']),
+        "200": APIResponse.schema("Список рецептов", context.schema['PaginatedRecipes']),
         "404": APIResponse("Рецепт не найден")
       };
     } else if (operation.method == "POST") {
@@ -41,12 +41,32 @@ class RecipeController extends ResourceController {
   }
   
   @Operation.post()
-  Future<Response> createRecipe(@Bind.body() Recipe recipe) async {
-    final query = Query<Recipe>(context)
-      ..values = recipe;
+  Future<Response> createRecipe() async {
+    // Читаем JSON вручную для лучшего контроля типов
+    final Map<String, dynamic> body = await request!.body.decode();
     
-    final insertedRecipe = await query.insert();
-    return Response.ok(insertedRecipe);
+    // Валидация обязательных полей
+    if (body['name'] == null || body['duration'] == null) {
+      return Response.badRequest(
+        body: {'error': 'name and duration are required'}
+      );
+    }
+    
+    // Дебаг типов
+    print('DEBUG: body[duration] = ${body['duration']} (${body['duration'].runtimeType})');
+    
+    // Создаем рецепт с правильными типами
+    final query = Query<Recipe>(context)
+      ..values.name = body['name'] as String
+      ..values.duration = (body['duration'] as num).toInt()
+      ..values.photo = body['photo'] as String?;
+    
+    try {
+      final insertedRecipe = await query.insert();
+      return Response.ok(insertedRecipe);
+    } catch (e) {
+      return Response.serverError(body: {'error': e.toString()});
+    }
   }
   
   @Operation.get()
@@ -133,21 +153,44 @@ class RecipeController extends ResourceController {
   }
   
   @Operation.put('id')
-  Future<Response> updateRecipe(
-    @Bind.path('id') int id,
-    @Bind.body() Recipe updatedRecipe,
-  ) async {
-    final query = Query<Recipe>(context)
-      ..where((r) => r.id).equalTo(id)
-      ..values = updatedRecipe;
+  Future<Response> updateRecipe(@Bind.path('id') int id) async {
+    // Читаем JSON вручную для лучшего контроля типов
+    final Map<String, dynamic> body = await request!.body.decode();
     
-    final recipe = await query.updateOne();
+    // Проверяем существование рецепта
+    final checkQuery = Query<Recipe>(context)
+      ..where((r) => r.id).equalTo(id);
+    final existing = await checkQuery.fetchOne();
     
-    if (recipe == null) {
+    if (existing == null) {
       return Response.notFound(body: {'error': 'Recipe not found'});
     }
     
-    return Response.ok(recipe);
+    // Обновляем только переданные поля
+    final updateQuery = Query<Recipe>(context)
+      ..where((r) => r.id).equalTo(id);
+    
+    if (body.containsKey('name')) {
+      updateQuery.values.name = body['name'] as String;
+    }
+    if (body.containsKey('duration')) {
+      updateQuery.values.duration = (body['duration'] as num).toInt();
+    }
+    if (body.containsKey('photo')) {
+      updateQuery.values.photo = body['photo'] as String?;
+    }
+    
+    try {
+      final recipe = await updateQuery.updateOne();
+      
+      if (recipe == null) {
+        return Response.notFound(body: {'error': 'Recipe not found'});
+      }
+      
+      return Response.ok(recipe);
+    } catch (e) {
+      return Response.serverError(body: {'error': e.toString()});
+    }
   }
   
   @Operation.delete('id')
@@ -199,7 +242,7 @@ class RecipeSearchController extends ResourceController {
   ) {
     if (operation.method == "GET") {
       return {
-        "200": APIResponse.schema("Результаты поиска рецептов", context.schema['Recipe']),
+        "200": APIResponse.schema("Результаты поиска рецептов", context.schema['PaginatedRecipes']),
         "400": APIResponse("Неверные параметры поиска")
       };
     }

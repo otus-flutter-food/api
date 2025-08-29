@@ -12,8 +12,8 @@ class AuthMiddleware extends Controller {
     final authHeader = request.raw.headers.value('authorization');
     
     if (authHeader == null || !authHeader.startsWith('Bearer ')) {
-      return Response.unauthorized(body: {'error': 'Missing or invalid authorization header'})
-        as Request?;
+      // Pass through; downstream controllers will check for user
+      return request;
     }
     
     final token = authHeader.substring(7); // Remove 'Bearer ' prefix
@@ -25,8 +25,7 @@ class AuthMiddleware extends Controller {
     final user = await query.fetchOne();
     
     if (user == null) {
-      return Response.unauthorized(body: {'error': 'Invalid token'})
-        as Request?;
+      return request;
     }
     
     // Add user to request for use in controllers

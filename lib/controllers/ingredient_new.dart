@@ -1,6 +1,6 @@
 import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_postgresql/conduit_postgresql.dart';
-import 'package:conduit_open_api/src/v3/response.dart';
+import 'package:conduit_open_api/v3.dart';
 import '../model/ingredient.dart';
 import '../model/freezer.dart';
 import '../middleware/naming_middleware.dart';
@@ -18,7 +18,7 @@ class IngredientController extends NamingController {
   ) {
     if (operation.method == "GET") {
       return {
-        "200": APIResponse.schema("Список ингредиентов", context.schema['Ingredient']),
+        "200": APIResponse.schema("Список ингредиентов", APISchemaObject.array(ofSchema: context.schema['Ingredient'])),
         "404": APIResponse("Ингредиент не найден")
       };
     } else if (operation.method == "POST") {
@@ -41,6 +41,7 @@ class IngredientController extends NamingController {
     }
     return {};
   }
+  
   
   @Operation.get()
   Future<Response> getAllIngredients() async {
@@ -70,27 +71,34 @@ class IngredientController extends NamingController {
   @Operation.post()
   Future<Response> createIngredient() async {
     try {
-      // Декодируем с поддержкой camelCase конвертации
-      final body = await decodeBodyWithNamingConversion();
-      
-      print("Creating ingredient with body: $body");
-      
-      if (body['name'] == null || body['calories_for_unit'] == null) {
+      // Читаем сырой JSON (camelCase поддерживается напрямую)
+      final raw = await request!.body.decode<Map<String, dynamic>>();
+      final name = raw['name'];
+      final calories = (raw.containsKey('caloriesForUnit')
+          ? (raw['caloriesForUnit'] as num?)?.toDouble()
+          : (raw['calories_for_unit'] as num?)?.toDouble());
+
+      print("Creating ingredient with raw body: $raw");
+
+      if (name == null || calories == null) {
         return createResponseWithNamingConversion(400, {"error": "name and caloriesForUnit are required"});
       }
       
       // Используем прямой SQL для вставки из-за проблем с типами в Conduit ORM
       final store = context.persistentStore as PostgreSQLPersistentStore;
       final values = <String, dynamic>{
-        'name': body['name'],
-        'calories_for_unit': body['calories_for_unit']?.toDouble(),
+        'name': name,
+        'calories_for_unit': calories,
       };
       
       String sql;
       
-      // Если указан measureUnit, добавим его
-      if (body['measureunit'] != null && body['measureunit']['id'] != null) {
-        final measureUnitId = int.tryParse(body['measureunit']['id'].toString());
+      // Если указан measureUnit (camelCase), поддерживаем как nested {measureUnit:{id}} или measureUnitId
+      final muIdRaw = raw['measureUnitId'] ?? raw['measure_unit_id'] ?? raw['measureunit_id'];
+      final muMap = (raw['measureUnit'] ?? raw['measure_unit'] ?? raw['measureunit']) as Map<String, dynamic>?;
+      final resolvedMu = muIdRaw ?? (muMap != null ? muMap['id'] : null);
+      if (resolvedMu != null) {
+        final measureUnitId = int.tryParse(resolvedMu.toString());
         if (measureUnitId == null) {
           return createResponseWithNamingConversion(400, {'error': 'Invalid measureUnit ID format'});
         }
@@ -149,8 +157,8 @@ class IngredientController extends NamingController {
   @Operation.put('id')
   Future<Response> updateIngredient(@Bind.path('id') int id) async {
     try {
-      // Декодируем с поддержкой camelCase конвертации
-      final body = await decodeBodyWithNamingConversion();
+      // Читаем сырой JSON (camelCase поддерживается напрямую)
+      final body = await request!.body.decode<Map<String, dynamic>>();
       
       // Используем прямой SQL из-за проблем с типами в Conduit ORM
       final store = context.persistentStore as PostgreSQLPersistentStore;
@@ -170,20 +178,20 @@ class IngredientController extends NamingController {
         updates.add('name = @name');
         values['name'] = body['name'];
       }
-      if (body.containsKey('calories_for_unit')) {
+      if (body.containsKey('caloriesForUnit') || body.containsKey('calories_for_unit')) {
         updates.add('calories_for_unit = @calories_for_unit');
-        values['calories_for_unit'] = body['calories_for_unit'];
+        values['calories_for_unit'] = (body['caloriesForUnit'] ?? body['calories_for_unit']);
       }
-      if (body.containsKey('measureunit') && body['measureunit'] != null) {
-        if (body['measureunit'] is Map && body['measureunit']['id'] != null) {
-          final measureUnitId = int.tryParse(body['measureunit']['id'].toString());
-          if (measureUnitId == null) {
-            return createResponseWithNamingConversion(400, {'error': 'Invalid measureUnit ID format'});
-          }
-          
-          updates.add('measureunit_id = @measureunit_id');
-          values['measureunit_id'] = measureUnitId;
+      final muIdRaw2 = body['measureUnitId'] ?? body['measure_unit_id'] ?? body['measureunit_id'];
+      final muMap2 = (body['measureUnit'] ?? body['measure_unit'] ?? body['measureunit']) as Map<String, dynamic>?;
+      if (muIdRaw2 != null || muMap2 != null) {
+        final resolved = muIdRaw2 ?? (muMap2 != null ? muMap2['id'] : null);
+        final measureUnitId = resolved != null ? int.tryParse(resolved.toString()) : null;
+        if (measureUnitId == null) {
+          return createResponseWithNamingConversion(400, {'error': 'Invalid measureUnit ID format'});
         }
+        updates.add('measureunit_id = @measureunit_id');
+        values['measureunit_id'] = measureUnitId;
       }
       
       if (updates.isEmpty) {

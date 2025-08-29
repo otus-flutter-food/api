@@ -1,6 +1,7 @@
 import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_open_api/src/v3/response.dart';
 import 'package:conduit_open_api/src/v3/schema.dart';
+import 'package:conduit_postgresql/conduit_postgresql.dart';
 import '../model/ingredient.dart';
 
 class MeasureUnitController extends ResourceController {
@@ -15,7 +16,7 @@ class MeasureUnitController extends ResourceController {
   ) {
     if (operation.method == "GET") {
       return {
-        "200": APIResponse.schema("Список единиц измерения", context.schema['MeasureUnit'])
+        "200": APIResponse.schema("Список единиц измерения", APISchemaObject.array(ofSchema: context.schema['MeasureUnit']))
       };
     } else if (operation.method == "POST") {
       return {
@@ -49,30 +50,50 @@ class MeasureUnitController extends ResourceController {
   }
   
   @Operation.post()
-  Future<Response> createUnit(@Bind.body() MeasureUnit unit) async {
-    final query = Query<MeasureUnit>(context)
-      ..values = unit;
-    
-    final insertedUnit = await query.insert();
-    return Response.ok(insertedUnit.asMap());
+  Future<Response> createUnit() async {
+    final Map<String, dynamic> body = await request!.body.decode();
+    final one = body['one']?.toString();
+    final few = body['few']?.toString();
+    final many = body['many']?.toString();
+    if (one == null || few == null || many == null) {
+      return Response.badRequest(body: {'error': 'one, few, many are required'});
+    }
+    try {
+      final store = context.persistentStore as PostgreSQLPersistentStore;
+      final rows = await store.execute(
+        'INSERT INTO _measureunit (one, few, many) VALUES (@one, @few, @many) '
+        'RETURNING id, one, few, many',
+        substitutionValues: {'one': one, 'few': few, 'many': many},
+      ) as List<List<dynamic>>;
+      if (rows.isEmpty) return Response.serverError(body: {'error': 'Insert failed'});
+      final r = rows.first;
+      return Response.ok({'id': r[0], 'one': r[1], 'few': r[2], 'many': r[3]});
+    } catch (e) {
+      return Response.badRequest(body: {'error': e.toString()});
+    }
   }
   
   @Operation.put('id')
   Future<Response> updateUnit(
     @Bind.path('id') int id,
-    @Bind.body() MeasureUnit updatedUnit,
   ) async {
-    final query = Query<MeasureUnit>(context)
-      ..where((u) => u.id).equalTo(id)
-      ..values = updatedUnit;
-    
-    final unit = await query.updateOne();
-    
-    if (unit == null) {
-      return Response.notFound(body: {'error': 'MeasureUnit not found'});
+    final Map<String, dynamic> body = await request!.body.decode();
+    final updates = <String>[];
+    final values = <String, dynamic>{'id': id};
+    if (body.containsKey('one')) { updates.add('one = @one'); values['one'] = body['one'].toString(); }
+    if (body.containsKey('few')) { updates.add('few = @few'); values['few'] = body['few'].toString(); }
+    if (body.containsKey('many')) { updates.add('many = @many'); values['many'] = body['many'].toString(); }
+    if (updates.isEmpty) return Response.badRequest(body: {'error': 'No fields to update'});
+    try {
+      final store = context.persistentStore as PostgreSQLPersistentStore;
+      await store.execute('UPDATE _measureunit SET ${updates.join(', ')} WHERE id = @id', substitutionValues: values);
+      final res = await store.execute('SELECT id, one, few, many FROM _measureunit WHERE id = @id', substitutionValues: {'id': id}) as List<List<dynamic>>;
+      if (res.isEmpty) return Response.notFound(body: {'error': 'MeasureUnit not found'});
+      final r = res.first;
+      return Response.ok({'id': r[0], 'one': r[1], 'few': r[2], 'many': r[3]});
+    } catch (e) {
+      return Response.badRequest(body: {'error': e.toString()});
     }
-    
-    return Response.ok(unit.asMap());
   }
   
   @Operation.delete('id')

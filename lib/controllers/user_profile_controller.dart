@@ -1,4 +1,5 @@
 import 'package:conduit_core/conduit_core.dart';
+import 'package:conduit_postgresql/conduit_postgresql.dart';
 import '../model/user.dart';
 import '../model/recipe.dart';
 import '../model/favorite.dart';
@@ -21,11 +22,11 @@ class UserProfileController extends ResourceController {
     final profile = {
       'id': user.id,
       'login': user.login,
-      // Production schema fields
-      'first_name': user.firstName,
-      'last_name': user.lastName,
+      // Public API uses camelCase keys
+      'firstName': user.firstName,
+      'lastName': user.lastName,
       'phone': user.phone,
-      'avatar_url': user.avatarUrl,
+      'avatarUrl': user.avatarUrl,
       'birthday': user.birthday?.toIso8601String(),
       // Don't return password or token
     };
@@ -39,61 +40,43 @@ class UserProfileController extends ResourceController {
   @Operation.put()
   Future<Response> updateProfile(@Bind.body() Map<String, dynamic> updates) async {
     final user = request!.attachments['user'] as User?;
-    
     if (user == null) {
       return Response.unauthorized(body: {'error': 'Authentication required'});
     }
-    
-    final query = Query<User>(context)
-      ..where((u) => u.id).equalTo(user.id!);
-    
-    // Allow updating profile fields
-    if (updates.containsKey('password')) {
-      query.values.password = updates['password'] as String;
+    final store = context.persistentStore as PostgreSQLPersistentStore;
+    final sets = <String>[];
+    final vals = <String, dynamic>{'id': user.id};
+    if (updates.containsKey('password')) { sets.add('password = @password'); vals['password'] = updates['password']; }
+    if (updates.containsKey('firstName')) { sets.add('first_name = @first_name'); vals['first_name'] = updates['firstName']; }
+    if (updates.containsKey('lastName')) { sets.add('last_name = @last_name'); vals['last_name'] = updates['lastName']; }
+    if (updates.containsKey('phone')) { sets.add('phone = @phone'); vals['phone'] = updates['phone']; }
+    if (updates.containsKey('avatarUrl')) { sets.add('avatar_url = @avatar_url'); vals['avatar_url'] = updates['avatarUrl']; }
+    if (updates.containsKey('birthday')) { sets.add('birthday = @birthday'); vals['birthday'] = updates['birthday']; }
+    if (sets.isEmpty) {
+      return Response.badRequest(body: {'error': 'No fields to update'});
     }
-    if (updates.containsKey('first_name')) {
-      query.values.firstName = updates['first_name'] as String?;
-    }
-    if (updates.containsKey('last_name')) {
-      query.values.lastName = updates['last_name'] as String?;
-    }
-    if (updates.containsKey('phone')) {
-      query.values.phone = updates['phone'] as String?;
-    }
-    if (updates.containsKey('avatar_url')) {
-      query.values.avatarUrl = updates['avatar_url'] as String?;
-    }
-    if (updates.containsKey('birthday')) {
-      final birthdayStr = updates['birthday'] as String?;
-      if (birthdayStr != null) {
-        query.values.birthday = DateTime.parse(birthdayStr);
-      }
-    }
-    
-    final updatedUser = await query.updateOne();
-    
-    if (updatedUser == null) {
-      return Response.serverError(body: {'error': 'Failed to update profile'});
-    }
-    
+    await store.execute('UPDATE _user SET ' + sets.join(', ') + ' WHERE id = @id', substitutionValues: vals);
+    final rows = await store.execute(
+      'SELECT id, login, first_name, last_name, phone, avatar_url, birthday FROM _user WHERE id=@id',
+      substitutionValues: {'id': user.id},
+    ) as List<List<dynamic>>;
+    if (rows.isEmpty) return Response.serverError(body: {'error': 'Failed to load profile'});
+    final r = rows.first;
     final profile = {
-      'id': updatedUser.id,
-      'login': updatedUser.login,
-      'first_name': updatedUser.firstName,
-      'last_name': updatedUser.lastName,
-      'phone': updatedUser.phone,
-      'avatar_url': updatedUser.avatarUrl,
-      'birthday': updatedUser.birthday?.toIso8601String(),
+      'id': r[0],
+      'login': r[1],
+      'firstName': r[2],
+      'lastName': r[3],
+      'phone': r[4],
+      'avatarUrl': r[5],
+      'birthday': (r[6] as DateTime?)?.toIso8601String(),
       'message': 'Profile updated successfully'
     };
-    
-    // Remove null values
-    profile.removeWhere((key, value) => value == null);
-    
+    profile.removeWhere((k, v) => v == null);
     return Response.ok(profile);
   }
   
-  @Operation.post('logout')
+  @Operation.post()
   Future<Response> logout() async {
     final user = request!.attachments['user'] as User?;
     
@@ -247,16 +230,23 @@ class UserCommentsController extends ResourceController {
       return Response.notFound(body: {'error': 'Recipe not found'});
     }
     
-    // Create comment
-    final query = Query<Comment>(context)
-      ..values.text = text
-      ..values.dateTime = DateTime.now()
-      ..values.user = user
-      ..values.recipe = recipe;
-    
-    final comment = await query.insert();
-    
-    return Response.ok(comment.asMap());
+    // Create comment via raw SQL to avoid ORM type issues
+    final store = context.persistentStore as PostgreSQLPersistentStore;
+    final rows = await store.execute(
+      'INSERT INTO _comment (user_id, recipe_id, text, date_time) '
+      'VALUES (CAST(@uid AS int4), CAST(@rid AS int4), @text, NOW()) RETURNING id',
+      substitutionValues: {'uid': user.id, 'rid': recipeId, 'text': text},
+    ) as List<List<dynamic>>;
+    final id = rows.first.first as int;
+    final result = await store.execute(
+      'SELECT c.id, c.text, c.photo, c.date_time, u.id as user_id, r.id as recipe_id, r.name '
+      'FROM _comment c JOIN _user u ON u.id=c.user_id JOIN _recipe r ON r.id=c.recipe_id '
+      'WHERE c.id=@id', substitutionValues: {'id': id}) as List<List<dynamic>>;
+    final r = result.first;
+    return Response.ok({
+      'id': r[0], 'text': r[1], 'photo': r[2], 'dateTime': (r[3] as DateTime?)?.toIso8601String(),
+      'user': {'id': r[4]}, 'recipe': {'id': r[5], 'name': r[6]},
+    });
   }
   
   @Operation.delete('id')

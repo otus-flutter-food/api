@@ -1,6 +1,8 @@
 import 'package:foodapi/foodapi.dart';
 import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_open_api/src/v3/response.dart';
+import 'package:conduit_open_api/v3.dart';
+import 'package:conduit_postgresql/conduit_postgresql.dart';
 import 'package:foodapi/model/recipe.dart';
 
 class RecipeStepController extends ResourceController {
@@ -15,7 +17,7 @@ class RecipeStepController extends ResourceController {
   ) {
     if (operation.method == "GET") {
       return {
-        "200": APIResponse.schema("Список шагов рецептов", context.schema['RecipeStep']),
+        "200": APIResponse.schema("Список шагов рецептов", APISchemaObject.array(ofSchema: context.schema['RecipeStep'])),
         "404": APIResponse("Шаг не найден")
       };
     } else if (operation.method == "POST") {
@@ -71,30 +73,70 @@ class RecipeStepController extends ResourceController {
   }
 
   @Operation.post()
-  Future<Response> createStep(@Bind.body(ignore: ['id']) RecipeStep step) async {
-    final query = Query<RecipeStep>(context)
-      ..values = step;
-    
-    final insertedStep = await query.insert();
-    return Response.ok(insertedStep);
+  Future<Response> createStep() async {
+    final Map<String, dynamic> body = await request!.body.decode();
+    final name = body['name']?.toString();
+    final duration = () {
+      final d = body['duration'];
+      if (d is num) return d.toInt();
+      if (d is String) return int.tryParse(d);
+      return null;
+    }();
+    if (name == null || duration == null) {
+      return Response.badRequest(body: {'error': 'name and duration are required'});
+    }
+    try {
+      final store = context.persistentStore as PostgreSQLPersistentStore;
+      final rows = await store.execute(
+        'INSERT INTO _recipestep (name, duration) VALUES (@name, CAST(@duration AS int4)) RETURNING id, name, duration',
+        substitutionValues: {'name': name, 'duration': duration},
+      ) as List<List<dynamic>>;
+      if (rows.isEmpty) return Response.serverError(body: {'error': 'Insert failed'});
+      final r = rows.first;
+      return Response.ok({'id': r[0], 'name': r[1], 'duration': r[2]});
+    } catch (e) {
+      return Response.badRequest(body: {'error': e.toString()});
+    }
   }
 
   @Operation.put('id')
   Future<Response> updateStep(
     @Bind.path('id') int id,
-    @Bind.body() RecipeStep step,
   ) async {
-    final query = Query<RecipeStep>(context)
-      ..where((s) => s.id).equalTo(id)
-      ..values = step;
-    
-    final updatedStep = await query.updateOne();
-    
-    if (updatedStep == null) {
-      return Response.notFound(body: {'error': 'Step not found'});
+    final Map<String, dynamic> body = await request!.body.decode();
+    final updates = <String>[];
+    final values = <String, dynamic>{'id': id};
+    if (body.containsKey('name')) {
+      updates.add('name = @name');
+      values['name'] = body['name'].toString();
     }
-    
-    return Response.ok(updatedStep);
+    if (body.containsKey('duration')) {
+      final d = body['duration'];
+      final parsed = d is num ? d.toInt() : (d is String ? int.tryParse(d) : null);
+      if (parsed != null) {
+        updates.add('duration = CAST(@duration AS int4)');
+        values['duration'] = parsed;
+      }
+    }
+    if (updates.isEmpty) {
+      return Response.badRequest(body: {'error': 'No fields to update'});
+    }
+    try {
+      final store = context.persistentStore as PostgreSQLPersistentStore;
+      await store.execute(
+        'UPDATE _recipestep SET ${updates.join(', ')} WHERE id = @id',
+        substitutionValues: values,
+      );
+      final res = await store.execute(
+        'SELECT id, name, duration FROM _recipestep WHERE id = @id',
+        substitutionValues: {'id': id},
+      ) as List<List<dynamic>>;
+      if (res.isEmpty) return Response.notFound(body: {'error': 'Step not found'});
+      final r = res.first;
+      return Response.ok({'id': r[0], 'name': r[1], 'duration': r[2]});
+    } catch (e) {
+      return Response.badRequest(body: {'error': e.toString()});
+    }
   }
 
   @Operation.delete('id')
