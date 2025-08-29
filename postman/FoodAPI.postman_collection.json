@@ -1,0 +1,328 @@
+{
+  "info": {
+    "name": "Food API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection covering public and protected endpoints for Food API"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://foodapi.dzolotov.pro" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /healthz",
+          "request": { "method": "GET", "url": "{{baseUrl}}/healthz" }
+        }
+      ]
+    },
+    {
+      "name": "Users (Public)",
+      "item": [
+        {
+          "name": "POST /user (register)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/user"
+          }
+        },
+        {
+          "name": "PUT /user (auth)",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/user"
+          }
+        },
+        {
+          "name": "GET /user/{id}",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/1", "host": ["{{baseUrl}}"], "path": ["user","1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users (Protected)",
+      "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+      "item": [
+        {
+          "name": "GET /user/profile",
+          "request": { "method": "GET", "url": "{{baseUrl}}/user/profile" }
+        },
+        {
+          "name": "PUT /user/profile",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ivan\",\n  \"lastName\": \"Petrov\",\n  \"avatarUrl\": \"https://example.com/avatar.jpg\"\n}"
+            },
+            "url": "{{baseUrl}}/user/profile"
+          }
+        },
+        {
+          "name": "POST /user/profile/logout",
+          "request": { "method": "POST", "url": "{{baseUrl}}/user/profile/logout" }
+        },
+        {
+          "name": "GET /user/favorites",
+          "request": { "method": "GET", "url": "{{baseUrl}}/user/favorites" }
+        },
+        {
+          "name": "POST /user/favorites/{recipeId}",
+          "request": { "method": "POST", "url": "{{baseUrl}}/user/favorites/1" }
+        },
+        {
+          "name": "DELETE /user/favorites/{recipeId}",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/user/favorites/1" }
+        },
+        {
+          "name": "GET /user/comments",
+          "request": { "method": "GET", "url": "{{baseUrl}}/user/comments" }
+        },
+        {
+          "name": "POST /user/comments",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"recipeId\": 1,\n  \"text\": \"Nice!\"\n}" },
+            "url": "{{baseUrl}}/user/comments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recipes",
+      "item": [
+        {
+          "name": "GET /recipe (list)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/recipe?page=1&limit=10&search=блин" }
+        },
+        { "name": "GET /recipe/{id}", "request": { "method": "GET", "url": "{{baseUrl}}/recipe/1" } },
+        {
+          "name": "POST /recipe",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"New Recipe\",\n  \"duration\": 1800,\n  \"photo\": \"https://example.com/photo.jpg\"\n}" },
+            "url": "{{baseUrl}}/recipe"
+          }
+        },
+        {
+          "name": "PUT /recipe/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated\",\n  \"duration\": 2000\n}" },
+            "url": "{{baseUrl}}/recipe/1"
+          }
+        },
+        { "name": "DELETE /recipe/{id}", "request": { "method": "DELETE", "url": "{{baseUrl}}/recipe/1" } },
+        { "name": "GET /recipe/search", "request": { "method": "GET", "url": "{{baseUrl}}/recipe/search?q=тест&page=1&limit=10" } }
+      ]
+    },
+    {
+      "name": "Steps",
+      "item": [
+        { "name": "GET /steps", "request": { "method": "GET", "url": "{{baseUrl}}/steps" } },
+        { "name": "GET /steps/{id}", "request": { "method": "GET", "url": "{{baseUrl}}/steps/1" } },
+        {
+          "name": "POST /steps",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Подготовка ингредиентов\",\n  \"duration\": 300\n}" },
+            "url": "{{baseUrl}}/steps"
+          }
+        },
+        { "name": "DELETE /steps/{id}", "request": { "method": "DELETE", "url": "{{baseUrl}}/steps/1" } }
+      ]
+    },
+    {
+      "name": "Step Links",
+      "item": [
+        { "name": "GET /recipe-step-links", "request": { "method": "GET", "url": "{{baseUrl}}/recipe-step-links" } },
+        { "name": "GET /recipe-step-links/{id}", "request": { "method": "GET", "url": "{{baseUrl}}/recipe-step-links/1" } },
+        { "name": "GET /recipe-step-links/recipe/{recipeId}", "request": { "method": "GET", "url": "{{baseUrl}}/recipe-step-links/recipe/1" } },
+        {
+          "name": "POST /recipe-step-links",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"recipeId\": 1,\n  \"stepId\": 1,\n  \"number\": 1\n}" },
+            "url": "{{baseUrl}}/recipe-step-links"
+          }
+        },
+        {
+          "name": "PUT /recipe-step-links/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"number\": 2\n}" },
+            "url": "{{baseUrl}}/recipe-step-links/1"
+          }
+        },
+        {
+          "name": "PUT /recipe-step-links/reorder",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipeId\": 1,\n  \"stepOrders\": [\n    {\"linkId\": 2, \"number\": 1},\n    {\"linkId\": 1, \"number\": 2}\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/recipe-step-links/reorder"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ingredients & Units",
+      "item": [
+        { "name": "GET /measure_unit", "request": { "method": "GET", "url": "{{baseUrl}}/measure_unit" } },
+        {
+          "name": "POST /measure_unit",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"one\": \"грамм\",\n  \"few\": \"грамма\",\n  \"many\": \"граммов\"\n}" },
+            "url": "{{baseUrl}}/measure_unit"
+          }
+        },
+        { "name": "DELETE /measure_unit/{id}", "request": { "method": "DELETE", "url": "{{baseUrl}}/measure_unit/1" } },
+        { "name": "GET /ingredient", "request": { "method": "GET", "url": "{{baseUrl}}/ingredient" } },
+        {
+          "name": "POST /ingredient",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Мёд\",\n  \"caloriesForUnit\": 3.04,\n  \"measureUnit\": {\"id\": 1}\n}" },
+            "url": "{{baseUrl}}/ingredient"
+          }
+        },
+        { "name": "GET /ingredient/{id}", "request": { "method": "GET", "url": "{{baseUrl}}/ingredient/1" } },
+        {
+          "name": "PUT /ingredient/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Мёд липовый\",\n  \"caloriesForUnit\": 3.1\n}" },
+            "url": "{{baseUrl}}/ingredient/1"
+          }
+        },
+        { "name": "DELETE /ingredient/{id}", "request": { "method": "DELETE", "url": "{{baseUrl}}/ingredient/1" } }
+      ]
+    },
+    {
+      "name": "Recipe Ingredients",
+      "item": [
+        { "name": "GET /recipe-ingredients", "request": { "method": "GET", "url": "{{baseUrl}}/recipe-ingredients?recipeId=1" } },
+        { "name": "GET /recipe-ingredients/{id}", "request": { "method": "GET", "url": "{{baseUrl}}/recipe-ingredients/1" } },
+        {
+          "name": "POST /recipe-ingredients",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"recipe\": {\"id\": 1},\n  \"ingredient\": {\"id\": 2},\n  \"count\": 500\n}" },
+            "url": "{{baseUrl}}/recipe-ingredients"
+          }
+        },
+        {
+          "name": "PUT /recipe-ingredients/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"count\": 600\n}" },
+            "url": "{{baseUrl}}/recipe-ingredients/1"
+          }
+        },
+        { "name": "DELETE /recipe-ingredients/{id}", "request": { "method": "DELETE", "url": "{{baseUrl}}/recipe-ingredients/1" } },
+        { "name": "GET /recipe-ingredients/recipe/{recipeId}", "request": { "method": "GET", "url": "{{baseUrl}}/recipe-ingredients/recipe/1" } },
+        { "name": "DELETE /recipe-ingredients/recipe/{recipeId}", "request": { "method": "DELETE", "url": "{{baseUrl}}/recipe-ingredients/recipe/1" } }
+      ]
+    },
+    {
+      "name": "Favorites (Public)",
+      "item": [
+        { "name": "GET /favorite", "request": { "method": "GET", "url": "{{baseUrl}}/favorite" } },
+        {
+          "name": "POST /favorite",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"user\": {\"id\": 1},\n  \"recipe\": {\"id\": 2}\n}" },
+            "url": "{{baseUrl}}/favorite"
+          }
+        },
+        { "name": "DELETE /favorite/{id}", "request": { "method": "DELETE", "url": "{{baseUrl}}/favorite/1" } }
+      ]
+    },
+    {
+      "name": "Freezer",
+      "item": [
+        { "name": "GET /freezer", "request": { "method": "GET", "url": "{{baseUrl}}/freezer" } },
+        { "name": "GET /freezer/{id}", "request": { "method": "GET", "url": "{{baseUrl}}/freezer/1" } },
+        {
+          "name": "POST /freezer",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": 1,\n  \"ingredientId\": 2,\n  \"count\": 2.5\n}" },
+            "url": "{{baseUrl}}/freezer"
+          }
+        },
+        {
+          "name": "PUT /freezer/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"count\": 5\n}" },
+            "url": "{{baseUrl}}/freezer/1"
+          }
+        },
+        { "name": "DELETE /freezer/{id}", "request": { "method": "DELETE", "url": "{{baseUrl}}/freezer/1" } }
+      ]
+    },
+    {
+      "name": "Comments (Public)",
+      "item": [
+        { "name": "GET /comment", "request": { "method": "GET", "url": "{{baseUrl}}/comment?recipeId=1" } },
+        {
+          "name": "POST /comment",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": 1,\n  \"recipeId\": 1,\n  \"text\": \"Отличный рецепт!\"\n}" },
+            "url": "{{baseUrl}}/comment"
+          }
+        },
+        { "name": "GET /comment/{id}", "request": { "method": "GET", "url": "{{baseUrl}}/comment/1" } },
+        {
+          "name": "PUT /comment/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"text\": \"Updated text\"\n}" },
+            "url": "{{baseUrl}}/comment/1"
+          }
+        },
+        { "name": "DELETE /comment/{id}", "request": { "method": "DELETE", "url": "{{baseUrl}}/comment/1" } }
+      ]
+    }
+  ]
+}
+
