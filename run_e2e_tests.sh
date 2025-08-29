@@ -5,7 +5,7 @@ echo "🚀 Запуск E2E тестов Food API..."
 echo "================================"
 
 # Проверка, что сервер запущен
-if ! curl -s http://localhost:8888/healthz > /dev/null; then
+if ! curl -s https://foodapi.dzolotov.pro/healthz > /dev/null; then
     echo "❌ Сервер не запущен на порту 8888!"
     echo "Запустите сервер командой: dart bin/main.dart"
     exit 1

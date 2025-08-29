@@ -10,7 +10,7 @@ import sys
 import time
 import requests
 
-BASE_URL = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8888"
+BASE_URL = sys.argv[1] if len(sys.argv) > 1 else "https://foodapi.dzolotov.pro"
 
 
 def log(name: str, ok: bool, msg: str = ""):

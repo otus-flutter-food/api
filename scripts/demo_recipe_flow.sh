@@ -8,10 +8,10 @@ set -euo pipefail
 #   scripts/demo_recipe_flow.sh [BASE_URL] [USER_ID]
 #
 # Defaults:
-#   BASE_URL: http://localhost:8888
+#   BASE_URL: https://foodapi.dzolotov.pro
 #   USER_ID: 1 (must exist in DB for comments)
 
-BASE_URL=${1:-http://localhost:8888}
+BASE_URL=${1:-https://foodapi.dzolotov.pro}
 USER_ID=${2:-1}
 
 require_tool() {

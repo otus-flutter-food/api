@@ -8,7 +8,7 @@ import sys
 import time
 import requests
 
-BASE_URL = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8888"
+BASE_URL = sys.argv[1] if len(sys.argv) > 1 else "https://foodapi.dzolotov.pro"
 USER_ID = int(sys.argv[2]) if len(sys.argv) > 2 else None
 
 

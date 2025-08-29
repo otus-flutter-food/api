@@ -14,7 +14,7 @@ def run_cmd(cmd):
 
 def main():
     ap = argparse.ArgumentParser(description='Run API integration tests')
-    ap.add_argument('base_url', nargs='?', default='http://localhost:8888')
+    ap.add_argument('base_url', nargs='?', default='https://foodapi.dzolotov.pro')
     ap.add_argument('--user-id', type=int, help='Existing user id for favorites/comments/freezer tests')
     args = ap.parse_args()
 

@@ -12,7 +12,7 @@ import time
 
 # Конфигурация
 BASE_URL = "https://foodapi.dzolotov.pro"
-# BASE_URL = "http://localhost:8888"  # Для локального тестирования
+# BASE_URL = "https://foodapi.dzolotov.pro"  # Для локального тестирования
 
 class RecipeAPITester:
     def __init__(self, base_url: str = BASE_URL):

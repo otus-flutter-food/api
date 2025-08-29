@@ -923,18 +923,18 @@ dart pub run conduit:conduit db upgrade --connect postgres://food:yaigoo2E@local
 Зависимости: Python 3 и библиотека `requests` (`python3 -m pip install --user requests`).
 
 - Запуск полного набора (без пользовательских сущностей):
-  - `python3 test_all.py http://localhost:8888`
+  - `python3 test_all.py https://foodapi.dzolotov.pro`
 - Запуск с тестами избранного/комментариев/морозилки (нужен существующий `USER_ID`):
-  - `python3 test_all.py http://localhost:8888 --user-id <USER_ID>`
+  - `python3 test_all.py https://foodapi.dzolotov.pro --user-id <USER_ID>`
 
 Индивидуальные тесты:
-- `python3 test_user_api.py http://localhost:8888`
-- `python3 test_recipe_api.py http://localhost:8888`
-- `python3 test_step_links_api.py http://localhost:8888`
-- `python3 test_ingredients_api.py http://localhost:8888`
-- `python3 test_favorites_api.py http://localhost:8888 <USER_ID>`
-- `python3 test_comments_api.py http://localhost:8888 <USER_ID>`
-- `python3 test_freezer_api.py http://localhost:8888 <USER_ID>`
+- `python3 test_user_api.py https://foodapi.dzolotov.pro`
+- `python3 test_recipe_api.py https://foodapi.dzolotov.pro`
+- `python3 test_step_links_api.py https://foodapi.dzolotov.pro`
+- `python3 test_ingredients_api.py https://foodapi.dzolotov.pro`
+- `python3 test_favorites_api.py https://foodapi.dzolotov.pro <USER_ID>`
+- `python3 test_comments_api.py https://foodapi.dzolotov.pro <USER_ID>`
+- `python3 test_freezer_api.py https://foodapi.dzolotov.pro <USER_ID>`
 
 Внимание: тесты создают и удаляют сущности (рецепты, шаги, ингредиенты). Не запускайте их против боевой базы без необходимости.
 
@@ -1060,12 +1060,12 @@ services:
 ### 🔐 Авторизация
 ```bash
 # Регистрация (если нужен новый пользователь)
-curl -X POST http://localhost:8888/user \
+curl -X POST https://foodapi.dzolotov.pro/user \
   -H "Content-Type: application/json" \
   -d '{"login": "chef@example.com", "password": "password123"}'
 
 # Вход и получение токена
-TOKEN=$(curl -X PUT http://localhost:8888/user \
+TOKEN=$(curl -X PUT https://foodapi.dzolotov.pro/user \
   -H "Content-Type: application/json" \
   -d '{"login": "chef@example.com", "password": "password123"}' | jq -r '.token')
 
@@ -1076,7 +1076,7 @@ echo "Токен: $TOKEN"
 
 #### 1. Создаем рецепт
 ```bash
-RECIPE_ID=$(curl -X POST http://localhost:8888/recipe \
+RECIPE_ID=$(curl -X POST https://foodapi.dzolotov.pro/recipe \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
@@ -1092,7 +1092,7 @@ echo "Создан рецепт ID: $RECIPE_ID"
 
 ```bash
 # Создаем новый ингредиент (если его еще нет)
-BEET_ID=$(curl -X POST http://localhost:8888/ingredient \
+BEET_ID=$(curl -X POST https://foodapi.dzolotov.pro/ingredient \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
@@ -1102,7 +1102,7 @@ BEET_ID=$(curl -X POST http://localhost:8888/ingredient \
   }' | jq -r '.id')
 
 # Привязываем ингредиент к рецепту (поддерживаются дробные значения!)
-curl -X POST http://localhost:8888/recipeIngredient \
+curl -X POST https://foodapi.dzolotov.pro/recipeIngredient \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
@@ -1112,7 +1112,7 @@ curl -X POST http://localhost:8888/recipeIngredient \
   }"
 
 # Добавляем существующие ингредиенты (например, 1.5 литра воды)
-curl -X POST http://localhost:8888/recipeIngredient \
+curl -X POST https://foodapi.dzolotov.pro/recipeIngredient \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
@@ -1126,7 +1126,7 @@ curl -X POST http://localhost:8888/recipeIngredient \
 
 ```bash
 # Создаем первый шаг
-STEP1_ID=$(curl -X POST http://localhost:8888/recipestep \
+STEP1_ID=$(curl -X POST https://foodapi.dzolotov.pro/recipestep \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
@@ -1134,7 +1134,7 @@ STEP1_ID=$(curl -X POST http://localhost:8888/recipestep \
   }' | jq -r '.id')
 
 # Привязываем шаг к рецепту
-curl -X POST http://localhost:8888/recipesteplink \
+curl -X POST https://foodapi.dzolotov.pro/recipesteplink \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
@@ -1144,7 +1144,7 @@ curl -X POST http://localhost:8888/recipesteplink \
   }"
 
 # Создаем второй шаг
-STEP2_ID=$(curl -X POST http://localhost:8888/recipestep \
+STEP2_ID=$(curl -X POST https://foodapi.dzolotov.pro/recipestep \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
@@ -1152,7 +1152,7 @@ STEP2_ID=$(curl -X POST http://localhost:8888/recipestep \
   }' | jq -r '.id')
 
 # Привязываем второй шаг
-curl -X POST http://localhost:8888/recipesteplink \
+curl -X POST https://foodapi.dzolotov.pro/recipesteplink \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
@@ -1162,14 +1162,14 @@ curl -X POST http://localhost:8888/recipesteplink \
   }"
 
 # Создаем третий шаг
-STEP3_ID=$(curl -X POST http://localhost:8888/recipestep \
+STEP3_ID=$(curl -X POST https://foodapi.dzolotov.pro/recipestep \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
     "name": "Добавить свеклу и тушеные овощи, варить еще 15 минут"
   }' | jq -r '.id')
 
-curl -X POST http://localhost:8888/recipesteplink \
+curl -X POST https://foodapi.dzolotov.pro/recipesteplink \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
@@ -1183,15 +1183,15 @@ curl -X POST http://localhost:8888/recipesteplink \
 
 ```bash
 # Получить рецепт со всеми данными
-curl -X GET "http://localhost:8888/recipe/$RECIPE_ID" \
+curl -X GET "https://foodapi.dzolotov.pro/recipe/$RECIPE_ID" \
   -H "Authorization: Bearer $TOKEN" | jq '.'
 
 # Получить все ингредиенты рецепта
-curl -X GET "http://localhost:8888/recipeIngredient?recipeId=$RECIPE_ID" \
+curl -X GET "https://foodapi.dzolotov.pro/recipeIngredient?recipeId=$RECIPE_ID" \
   -H "Authorization: Bearer $TOKEN" | jq '.'
 
 # Получить все шаги рецепта (отсортированы по номеру)
-curl -X GET "http://localhost:8888/recipesteplink?recipeId=$RECIPE_ID" \
+curl -X GET "https://foodapi.dzolotov.pro/recipesteplink?recipeId=$RECIPE_ID" \
   -H "Authorization: Bearer $TOKEN" | jq '.'
 ```
 
@@ -1199,7 +1199,7 @@ curl -X GET "http://localhost:8888/recipesteplink?recipeId=$RECIPE_ID" \
 
 ```bash
 # Обновить основную информацию
-curl -X PUT "http://localhost:8888/recipe/$RECIPE_ID" \
+curl -X PUT "https://foodapi.dzolotov.pro/recipe/$RECIPE_ID" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
@@ -1209,7 +1209,7 @@ curl -X PUT "http://localhost:8888/recipe/$RECIPE_ID" \
   }'
 
 # Изменить количество ингредиента
-curl -X PUT "http://localhost:8888/recipeIngredient" \
+curl -X PUT "https://foodapi.dzolotov.pro/recipeIngredient" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
@@ -1219,7 +1219,7 @@ curl -X PUT "http://localhost:8888/recipeIngredient" \
   }"
 
 # Изменить порядок шага
-curl -X PUT "http://localhost:8888/recipesteplink" \
+curl -X PUT "https://foodapi.dzolotov.pro/recipesteplink" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
@@ -1233,15 +1233,15 @@ curl -X PUT "http://localhost:8888/recipesteplink" \
 
 ```bash
 # Отвязать ингредиент от рецепта
-curl -X DELETE "http://localhost:8888/recipeIngredient?recipeId=$RECIPE_ID&ingredientId=$BEET_ID" \
+curl -X DELETE "https://foodapi.dzolotov.pro/recipeIngredient?recipeId=$RECIPE_ID&ingredientId=$BEET_ID" \
   -H "Authorization: Bearer $TOKEN"
 
 # Отвязать шаг от рецепта
-curl -X DELETE "http://localhost:8888/recipesteplink?recipeId=$RECIPE_ID&stepId=$STEP1_ID" \
+curl -X DELETE "https://foodapi.dzolotov.pro/recipesteplink?recipeId=$RECIPE_ID&stepId=$STEP1_ID" \
   -H "Authorization: Bearer $TOKEN"
 
 # Привязать заново с другими параметрами
-curl -X POST http://localhost:8888/recipeIngredient \
+curl -X POST https://foodapi.dzolotov.pro/recipeIngredient \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
@@ -1255,15 +1255,15 @@ curl -X POST http://localhost:8888/recipeIngredient \
 
 ```bash
 # Удалить отдельный ингредиент (если не используется в рецептах)
-curl -X DELETE "http://localhost:8888/ingredient/$BEET_ID" \
+curl -X DELETE "https://foodapi.dzolotov.pro/ingredient/$BEET_ID" \
   -H "Authorization: Bearer $TOKEN"
 
 # Удалить отдельный шаг (если не используется в рецептах)
-curl -X DELETE "http://localhost:8888/recipestep/$STEP1_ID" \
+curl -X DELETE "https://foodapi.dzolotov.pro/recipestep/$STEP1_ID" \
   -H "Authorization: Bearer $TOKEN"
 
 # Удалить весь рецепт (автоматически удалит все связи)
-curl -X DELETE "http://localhost:8888/recipe/$RECIPE_ID" \
+curl -X DELETE "https://foodapi.dzolotov.pro/recipe/$RECIPE_ID" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -1271,7 +1271,7 @@ curl -X DELETE "http://localhost:8888/recipe/$RECIPE_ID" \
 
 ```bash
 # Добавить в избранное
-curl -X POST http://localhost:8888/favorite \
+curl -X POST https://foodapi.dzolotov.pro/favorite \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
@@ -1280,7 +1280,7 @@ curl -X POST http://localhost:8888/favorite \
   }"
 
 # Добавить комментарий
-curl -X POST http://localhost:8888/comment \
+curl -X POST https://foodapi.dzolotov.pro/comment \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{
@@ -1290,7 +1290,7 @@ curl -X POST http://localhost:8888/comment \
   }"
 
 # Поиск рецептов
-curl -X GET "http://localhost:8888/recipe/search?q=борщ&page=1&limit=10" \
+curl -X GET "https://foodapi.dzolotov.pro/recipe/search?q=борщ&page=1&limit=10" \
   -H "Authorization: Bearer $TOKEN" | jq '.'
 ```
 
