@@ -222,8 +222,8 @@ class FoodapiChannel extends ApplicationChannel {
       });
 
     // Recipe endpoints
-    router.route("/recipe[/:id]").link(() => RecipeController(context));
     router.route("/recipe/search").link(() => RecipeSearchController(context));
+    router.route("/recipe[/:id]").link(() => RecipeController(context));
     
     // Recipe steps
     router.route("/steps[/:id]").link(() => RecipeStepController(context));
