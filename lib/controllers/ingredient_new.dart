@@ -84,38 +84,39 @@ class IngredientController extends NamingController {
         return createResponseWithNamingConversion(400, {"error": "name and caloriesForUnit are required"});
       }
       
-      // Используем прямой SQL для вставки из-за проблем с типами в Conduit ORM
-      final store = context.persistentStore as PostgreSQLPersistentStore;
-      final values = <String, dynamic>{
-        'name': name,
-        'calories_for_unit': calories,
-      };
-      
-      String sql;
-      
-      // Если указан measureUnit (camelCase), поддерживаем как nested {measureUnit:{id}} или measureUnitId
+      // Получаем measureUnit ID из разных возможных форматов
       final muIdRaw = raw['measureUnitId'] ?? raw['measure_unit_id'] ?? raw['measureunit_id'];
       final muMap = (raw['measureUnit'] ?? raw['measure_unit'] ?? raw['measureunit']) as Map<String, dynamic>?;
       final resolvedMu = muIdRaw ?? (muMap != null ? muMap['id'] : null);
-      if (resolvedMu != null) {
-        final measureUnitId = int.tryParse(resolvedMu.toString());
-        if (measureUnitId == null) {
-          return createResponseWithNamingConversion(400, {'error': 'Invalid measureUnit ID format'});
-        }
-        
-        // Проверим, что measureUnit существует
-        final checkSql = 'SELECT id FROM _measureunit WHERE id = @measureunit_id';
-        final checkResult = await store.execute(checkSql, substitutionValues: {'measureunit_id': measureUnitId});
-        
-        if (checkResult.isEmpty) {
-          return createResponseWithNamingConversion(400, {'error': 'Invalid measureUnit ID'});
-        }
-        
-        values['measureunit_id'] = measureUnitId;
-        sql = "INSERT INTO _ingredient (name, calories_for_unit, measureunit_id) VALUES (@name, @calories_for_unit, @measureunit_id) RETURNING id, name, calories_for_unit, measureunit_id";
-      } else {
-        sql = "INSERT INTO _ingredient (name, calories_for_unit) VALUES (@name, @calories_for_unit) RETURNING id, name, calories_for_unit, measureunit_id";
+      
+      // measureUnit обязателен!
+      if (resolvedMu == null) {
+        return createResponseWithNamingConversion(400, {'error': 'measureUnitId is required'});
       }
+      
+      final measureUnitId = int.tryParse(resolvedMu.toString());
+      if (measureUnitId == null) {
+        return createResponseWithNamingConversion(400, {'error': 'Invalid measureUnit ID format'});
+      }
+      
+      // Используем прямой SQL для вставки из-за проблем с типами в Conduit ORM
+      final store = context.persistentStore as PostgreSQLPersistentStore;
+      
+      // Проверим, что measureUnit существует
+      final checkSql = 'SELECT id FROM _measureunit WHERE id = @measureunit_id';
+      final checkResult = await store.execute(checkSql, substitutionValues: {'measureunit_id': measureUnitId});
+      
+      if (checkResult.isEmpty) {
+        return createResponseWithNamingConversion(400, {'error': 'Invalid measureUnit ID - unit does not exist'});
+      }
+      
+      final values = <String, dynamic>{
+        'name': name,
+        'calories_for_unit': calories,
+        'measureunit_id': measureUnitId,
+      };
+      
+      final sql = "INSERT INTO _ingredient (name, calories_for_unit, measureunit_id) VALUES (@name, @calories_for_unit, @measureunit_id) RETURNING id, name, calories_for_unit, measureunit_id";
       
       final result = await store.execute(sql, substitutionValues: values) as List<List<dynamic>>;
       
