@@ -163,8 +163,17 @@ curl https://foodapi.dzolotov.pro/ingredient
 curl https://foodapi.dzolotov.pro/ingredient/3
 ```
 
-**POST /ingredient** - Создать новый ингредиент
+**POST /ingredient** - Создать новый ингредиент (measureUnitId обязателен!)
 ```bash
+curl -X POST https://foodapi.dzolotov.pro/ingredient \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Мёд",
+    "caloriesForUnit": 3.04,
+    "measureUnitId": 1
+  }'
+
+# Или можно использовать вложенную структуру:
 curl -X POST https://foodapi.dzolotov.pro/ingredient \
   -H "Content-Type: application/json" \
   -d '{
@@ -1094,7 +1103,7 @@ echo "Создан рецепт ID: $RECIPE_ID"
 #### 2. Добавляем ингредиенты
 
 ```bash
-# Создаем новый ингредиент (если его еще нет)
+# Создаем новый ингредиент (если его еще нет) - measureUnitId обязателен!
 BEET_ID=$(curl -X POST https://foodapi.dzolotov.pro/ingredient \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
